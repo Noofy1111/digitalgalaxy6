@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مجرة المهارات الرقمية</title>
+
+    <!-- إضافة مكتبة jsPDF وأيضاً html2canvas لدعم العربية بشكل أفضل من خلال صورة إذا تطلب الأمر -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
         /* Transitions + hover */
         .screen {
@@ -288,6 +292,51 @@
             overflow: hidden;
         }
 
+        /* حركات بصرية إضافية */
+        @keyframes shake {
+            0% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            50% {
+                transform: translateX(5px);
+            }
+
+            75% {
+                transform: translateX(-5px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .wrong-shake {
+            animation: shake 0.4s ease-in-out;
+            border-color: var(--error) !important;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5) !important;
+        }
+
+        .confetti {
+            position: fixed;
+            top: -10px;
+            width: 8px;
+            height: 8px;
+            z-index: 1000;
+            animation: fall linear forwards;
+            border-radius: 50%;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
         .star {
             position: absolute;
             background: white;
@@ -331,26 +380,76 @@
                 display: none !important;
             }
 
-            #certificate-screen {
+            .print-visible {
                 display: block !important;
                 position: absolute;
                 top: 0;
                 left: 0;
                 width: 100%;
                 border: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+
+            .designer-signature {
+                display: block !important;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                color: black !important;
+                opacity: 1 !important;
             }
 
             .no-print {
                 display: none !important;
             }
         }
+
+        /* توقيع المصمم الثابت */
+        .designer-signature {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            color: #f8fafc;
+            padding: 8px 10px;
+            font-size: 0.9rem;
+            z-index: 9999;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @media print {
+            .designer-signature {
+                position: fixed;
+                bottom: 0px;
+                background: none !important;
+                color: black !important;
+                border: none !important;
+                font-size: 10pt;
+            }
+        }
     </style>
 </head>
 
 <body>
+    <!-- زر التحكم بالصوت -->
+    <button id="audio-toggle-btn" class="no-print" onclick="toggleAudio()"
+        style="position: fixed; top: 15px; left: 15px; z-index: 10000; background: rgba(56, 189, 248, 0.2); border: 1px solid var(--accent); color: var(--text-color); padding: 8px 15px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; transition: 0.3s; backdrop-filter: blur(5px);">
+        🔊 تشغيل الصوت
+    </button>
+
+    <!-- التوقيع الثابت يظهر في كل الشاشات -->
+    <div class="designer-signature">
+        تصميم وتنفيذ: المعلم الخبير مايكروسوفت الإبداعي أ/ نوف فيصل الرشيدي — المدرسة المركزية للبنات بحائل
+    </div>
+
     <div class="stars" id="stars"></div>
 
-    <div class="container">
+    <div class="container" style="padding-bottom: 50px;"> <!-- مساحة للتوقيع السفلي -->
         <div id="user-profile"
             style="display:none; text-align:right; margin-bottom: 15px; font-size: 1.1rem; color: var(--accent); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
             👤 الكابتن: <strong id="display-name"></strong>
@@ -371,13 +470,16 @@
             <button onclick="goBack('home-screen')"
                 style="background: transparent; color: #cbd5e1; border: 1px solid #cbd5e1; margin-bottom: 20px; width: auto; padding: 5px 15px;">↩
                 رجوع</button>
+            <button onclick="showStationCertificatesMenu()"
+                style="background: transparent; color: var(--accent); border: 1px solid var(--accent); margin-bottom: 20px; width: auto; padding: 5px 15px; margin-right: 10px;">
+                عرض شهادات المحطات 🏆</button>
             <h2>محطات الفضاء</h2>
             <p>اختر محطة للبدء، يجب إكمال جميع المحطات!</p>
             <div id="score-display">النقاط: <span id="current-score">0</span> / <span id="max-score">13</span></div>
             <div class="stations-grid">
                 <div class="station-card" id="card-0" onclick="startStation(0)">
                     <div class="station-icon">📄</div>
-                    <h3>التصميم ٠ المتقدم للمستندات</h3>
+                    <h3>التصميم المتقدم للمستندات</h3>
                 </div>
                 <div class="station-card" id="card-1" onclick="startStation(1)">
                     <div class="station-icon">🌐</div>
@@ -452,6 +554,9 @@
             <button id="cert-btn-display" onclick="showCertificate()"
                 style="background: var(--primary); margin-bottom: 10px; width: 100%; display: none;">📜
                 عرض الشهادة للطباعة</button>
+            <button id="worksheet-btn-display" onclick="generateWorksheet()"
+                style="background: var(--accent); margin-bottom: 10px; width: 100%; display: none;">📝
+                إصدار ورقة عمل علاجية PDF</button>
             <button onclick="goBack('stations-screen')"
                 style="background: transparent; color: #cbd5e1; border: 1px solid #cbd5e1; margin-bottom: 10px; width: 100%;">↩
                 تصفح المحطات المنجزة</button>
@@ -484,15 +589,163 @@
             </div>
             <div class="no-print"
                 style="margin-top: 30px; display: flex; gap: 10px; justify-content: center; flex-direction: column;">
-                <button onclick="window.print()" style="background: var(--success); width: 100%;">�️ التصدير كـ PDF /
+                <button onclick="printElement('certificate-screen')"
+                    style="background: var(--success); width: 100%;">🖨️ التصدير كـ PDF /
                     طباعة</button>
+                <button id="worksheet-btn-cert" onclick="generateWorksheet()"
+                    style="background: var(--accent); width: 100%; display: none;">📝
+                    إصدار ورقة عمل علاجية PDF</button>
                 <button onclick="goBack('result-screen')" style="background: #64748b; width: 100%;">↩ رجوع
                     للنتائج</button>
+            </div>
+        </div>
+
+        <!-- شاشة ورقة العمل العلاجية -->
+        <div id="worksheet-screen" class="screen"
+            style="background: white; color: black; border-radius: 15px; padding: 40px; text-align: right; border: 5px solid #cbd5e1;">
+            <div
+                style="text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 20px;">
+                <h1 style="color: var(--primary); margin-bottom: 10px;">ورقة عمل علاجية للمهارات المفقودة 📝</h1>
+                <p style="font-size: 1.2rem; margin: 5px 0;">اسم الطالب: <strong id="worksheet-name"
+                        style="color: var(--accent);"></strong></p>
+                <p style="font-size: 1.1rem; margin: 0;">التاريخ: <strong id="worksheet-date"></strong></p>
+            </div>
+
+            <div id="worksheet-content"></div>
+
+            <div class="no-print" style="margin-top: 30px; display: flex; gap: 10px; justify-content: center;">
+                <button onclick="printElement('worksheet-screen')" style="background: var(--success); width: 100%;">🖨️
+                    طباعة ورقة العمل</button>
+                <button onclick="goBack('result-screen')" style="background: #64748b; width: 100%;">↩ رجوع</button>
+            </div>
+        </div>
+
+        <!-- قائمة شهادات المحطات -->
+        <div id="station-certs-menu-screen" class="screen">
+            <h1>شهادات المحطات 🏆</h1>
+            <p>اختر المحطة لطباعة شهادتها التفصيلية:</p>
+            <div id="station-certs-list" style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px;">
+            </div>
+            <button onclick="goBack('stations-screen')"
+                style="background: transparent; border: 1px solid #cbd5e1; color: #cbd5e1; width: 100%;">↩ رجوع
+                للمحطات</button>
+        </div>
+
+        <!-- شاشة طباعة شهادة المحطة -->
+        <div id="station-cert-print-screen" class="screen"
+            style="background: white; color: black; border-radius: 15px; padding: 40px; text-align: center; border: 10px solid var(--accent);">
+            <div style="border: 2px dashed var(--primary); padding: 30px; border-radius: 10px;">
+                <h1 style="color: var(--primary); font-size: 2.2rem; margin-bottom: 5px;">شهادة إنجاز محطة 🎖️</h1>
+                <h2 id="station-cert-title" style="color: #475569; margin-top: 0; margin-bottom: 30px;">عنوان المحطة
+                </h2>
+                <h2 id="station-cert-name"
+                    style="color: var(--accent); font-size: 2rem; border-bottom: 2px solid var(--accent); display: inline-block; padding-bottom: 5px;">
+                    اسم الطالب</h2>
+
+                <div
+                    style="display: flex; justify-content: space-around; margin: 30px 0; font-size: 1.2rem; background: #f8fafc; padding: 15px; border-radius: 10px;">
+                    <div>النتيجة: <strong id="station-cert-score" style="color: var(--success);"></strong>%</div>
+                    <div>الأسئلة الصحيحة: <strong id="station-cert-correct"></strong> / <span
+                            id="station-cert-total"></span></div>
+                </div>
+
+                <div style="text-align: right; margin-bottom: 20px;">
+                    <h3 style="color: var(--success); margin-bottom: 10px;">✅ الأهداف المتقنة:</h3>
+                    <ul id="station-cert-mastered" style="list-style-type: none; padding-right: 20px; color: #334155;">
+                    </ul>
+                </div>
+
+                <div style="text-align: right; margin-bottom: 30px;">
+                    <h3 style="color: var(--error); margin-bottom: 10px;">🎯 الأهداف التي تحتاج تعزيز:</h3>
+                    <ul id="station-cert-needs-work"
+                        style="list-style-type: none; padding-right: 20px; color: #334155;"></ul>
+                </div>
+
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-end; font-size: 1rem; font-weight: bold; border-top: 2px solid #e2e8f0; padding-top: 20px;">
+                    <div>تاريخ الإصدار: <span id="station-cert-date"></span></div>
+                    <div style="text-align: left; font-family: monospace; font-size: 0.8rem; color: #64748b;"
+                        id="station-cert-qr"></div>
+                </div>
+            </div>
+
+            <div class="no-print" style="margin-top: 30px; display: flex; gap: 10px; justify-content: center;">
+                <button onclick="printElement('station-cert-print-screen')"
+                    style="background: var(--success); width: 100%;">🖨️ طباعة الشهادة</button>
+                <button onclick="goBack('station-certs-menu-screen')" style="background: #64748b; width: 100%;">↩ رجوع
+                    للقائمة</button>
             </div>
         </div>
     </div>
 
     <script>
+        // إعدادات الصوت (Web Audio API)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let isAudioEnabled = false;
+
+        function toggleAudio() {
+            isAudioEnabled = !isAudioEnabled;
+            const btn = document.getElementById('audio-toggle-btn');
+            if (isAudioEnabled) {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                btn.innerHTML = '🔊 إيقاف الصوت';
+                btn.style.background = 'rgba(34, 197, 94, 0.2)';
+                btn.style.borderColor = 'var(--success)';
+            } else {
+                btn.innerHTML = '🔇 تشغيل الصوت';
+                btn.style.background = 'rgba(239, 68, 68, 0.2)';
+                btn.style.borderColor = 'var(--error)';
+            }
+        }
+
+        function playTone(freq, type, duration, vol = 0.1) {
+            if (!isAudioEnabled) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function playClickSound() {
+            playTone(600, 'sine', 0.1, 0.05); // صوت نقرة خفيف
+        }
+
+        function playCorrectSound() {
+            playTone(523.25, 'sine', 0.1, 0.1); // C5
+            setTimeout(() => playTone(659.25, 'sine', 0.15, 0.1), 100); // E5
+            setTimeout(() => playTone(783.99, 'sine', 0.2, 0.1), 250); // G5
+        }
+
+        function playWrongSound() {
+            playTone(300, 'sawtooth', 0.3, 0.1); // Low buzz
+            setTimeout(() => playTone(250, 'sawtooth', 0.4, 0.1), 150);
+        }
+
+        function playCompletionSound() {
+            playTone(440, 'triangle', 0.2, 0.1); // A4
+            setTimeout(() => playTone(554.37, 'triangle', 0.2, 0.1), 200); // C#5
+            setTimeout(() => playTone(659.25, 'triangle', 0.2, 0.1), 400); // E5
+            setTimeout(() => playTone(880, 'triangle', 0.4, 0.1), 600); // A5
+        }
+
+        // إضافة مستمعين للنقرات على الأزرار لتشغيل صوت النقرة
+        document.addEventListener('click', (e) => {
+            if (e.target.tagName.toLowerCase() === 'button' || e.target.closest('.station-card') || e.target.closest('.option')) {
+                if (e.target.id !== 'audio-toggle-btn') {
+                    playClickSound();
+                }
+            }
+        });
+
         // بيانات الأهداف التعلّمية والأنشطة العلاجية
         const objectivesData = {
             "obj1_1": {
@@ -1142,12 +1395,22 @@
             }
         ];
 
+        // تعيين الأهداف لكل سؤال بناءً على ترتيبه
+        stationsData.forEach((station, index) => {
+            const unitObj1 = `obj${index + 1}_1`;
+            const unitObj2 = `obj${index + 1}_2`;
+            station.questions.forEach((q, qIndex) => {
+                q.objectiveId = (qIndex < 8) ? unitObj1 : unitObj2;
+            });
+        });
+
         // الحالة
         let currentStation = null;
         let currentQuestionIndex = 0;
         let score = 0;
         let stationScores = {};
         let stationProgressIndex = {}; // حفظ مؤشر التوقف لكل محطة
+        let objectiveScores = {};      // تتبع أداء الأهداف
         let completedStations = [];
         let playerName = "";
 
@@ -1167,10 +1430,33 @@
             }
         }
 
-        // التنقل بين الشاشات
+        // التنقل بين الشاشات مع تأثير Fade
         function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
+            const screens = document.querySelectorAll('.screen');
+            let hasActive = false;
+
+            screens.forEach(s => {
+                if (s.classList.contains('active')) {
+                    hasActive = true;
+                    s.classList.remove('active');
+                    setTimeout(() => {
+                        s.style.display = 'none';
+                    }, 400); // 400ms is the CSS transition duration
+                }
+            });
+
+            const showTarget = () => {
+                const target = document.getElementById(screenId);
+                target.style.display = 'block';
+                void target.offsetWidth; // Force reflow
+                target.classList.add('active');
+            };
+
+            if (hasActive) {
+                setTimeout(showTarget, 400);
+            } else {
+                showTarget();
+            }
         }
 
         window.goBack = function (screenId) {
@@ -1195,6 +1481,7 @@
                 completedStations = data.completedStations || [];
                 stationScores = data.stationScores || {};
                 stationProgressIndex = data.stationProgressIndex || {};
+                objectiveScores = data.objectiveScores || {};
 
                 document.getElementById('current-score').innerText = score;
                 completedStations.forEach(id => {
@@ -1206,6 +1493,7 @@
                 completedStations = [];
                 stationScores = {};
                 stationProgressIndex = {};
+                objectiveScores = {};
                 document.getElementById('current-score').innerText = score;
                 document.querySelectorAll('.station-card').forEach(card => card.classList.remove('completed'));
                 document.getElementById('finish-btn').style.display = 'none';
@@ -1220,7 +1508,8 @@
                 score: score,
                 completedStations: completedStations,
                 stationScores: stationScores,
-                stationProgressIndex: stationProgressIndex
+                stationProgressIndex: stationProgressIndex,
+                objectiveScores: objectiveScores
             };
             localStorage.setItem('digitalGalaxySave_' + playerName, JSON.stringify(data));
         }
@@ -1324,13 +1613,36 @@
                 element.classList.add('correct');
             } else {
                 element.classList.add('wrong');
+                element.classList.add('wrong-shake');
                 options[q.answer].classList.add('correct');
             }
 
             showFeedback(isCorrect, q);
         }
 
+        function triggerConfetti() {
+            const colors = ['#fde047', '#38bdf8', '#22c55e', '#ef4444', '#a855f7'];
+            for (let i = 0; i < 40; i++) {
+                let conf = document.createElement('div');
+                conf.className = 'confetti';
+                conf.style.left = Math.random() * 100 + 'vw';
+                conf.style.animationDuration = (Math.random() * 1 + 0.8) + 's';
+                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                document.body.appendChild(conf);
+                setTimeout(() => conf.remove(), 2000);
+            }
+        }
+
         function showFeedback(isCorrect, q) {
+            if (isCorrect) triggerConfetti();
+
+            let objId = q.objectiveId;
+            if (objId) {
+                if (!objectiveScores[objId]) objectiveScores[objId] = { total: 0, correct: 0 };
+                objectiveScores[objId].total++;
+                if (isCorrect) objectiveScores[objId].correct++;
+            }
+
             const feedback = document.getElementById('feedback-msg');
             feedback.style.display = 'block';
 
@@ -1370,8 +1682,10 @@
             nextBtn.style.display = 'inline-block';
 
             if (currentQuestionIndex === currentStation.questions.length - 1) {
-                nextBtn.innerText = "العودة للمحطات والمتابعة ↩";
-                nextBtn.onclick = returnToStations;
+                nextBtn.innerText = "عرض شهادة إتمام المحطة 🏆";
+                nextBtn.onclick = () => {
+                    printStationCert(currentStation.id);
+                };
 
                 if (!completedStations.includes(currentStation.id)) {
                     completedStations.push(currentStation.id);
@@ -1436,8 +1750,47 @@
             saveToLeaderboard(playerName, score, percentage);
             displayLeaderboard();
 
+            let hasNeedsWorkGlobal = false;
+
+            if (!document.getElementById('global-needs-work-list')) {
+                const breakdownContainer = document.getElementById('station-scores-breakdown');
+                breakdownContainer.insertAdjacentHTML('afterend', `
+                    <div id="global-skills-container" style="display: none; text-align: right; background: rgba(0,0,0,0.2); margin-top: 15px; padding: 15px; border-radius: 10px;">
+                        <h3 style="color: var(--error); margin-bottom: 5px; font-size: 1.1rem;">🎯 مهارات تحتاج تعزيز للطباعة:</h3>
+                        <ul id="global-needs-work-list" class="needs-work" style="list-style-type: none; padding-right: 15px; margin: 0; color: #f8fafc; font-size: 0.9rem;"></ul>
+                    </div>
+                `);
+            }
+
+            const globalNeedsWorkList = document.getElementById('global-needs-work-list');
+            globalNeedsWorkList.innerHTML = '';
+
+            for (const [objId, data] of Object.entries(objectiveScores)) {
+                if (data.total > 0) {
+                    const info = objectivesData[objId];
+                    if (info) {
+                        const objPercentage = (data.correct / data.total) * 100;
+                        if (objPercentage < 80) {
+                            globalNeedsWorkList.innerHTML += `<li>${info.title}</li>`;
+                            hasNeedsWorkGlobal = true;
+                        }
+                    }
+                }
+            }
+
+            if (hasNeedsWorkGlobal) {
+                document.getElementById('global-skills-container').style.display = 'block';
+                document.getElementById('worksheet-btn-display').style.display = 'block';
+            } else {
+                if (document.getElementById('global-skills-container')) {
+                    document.getElementById('global-skills-container').style.display = 'none';
+                }
+                document.getElementById('worksheet-btn-display').style.display = 'none';
+            }
+
             if (completedStations.length === stationsData.length) {
                 document.getElementById('cert-btn-display').style.display = 'block';
+                playCompletionSound();
             }
 
             showScreen('result-screen');
@@ -1524,6 +1877,155 @@
             document.getElementById('finish-btn').style.display = 'none';
             document.getElementById('cert-btn-display').style.display = 'none';
             showScreen('home-screen');
+        }
+
+        window.showStationCertificatesMenu = function () {
+            const listContainer = document.getElementById('station-certs-list');
+            listContainer.innerHTML = '';
+
+            stationsData.forEach(st => {
+                const isCompleted = completedStations.includes(st.id);
+                const score = stationScores[st.id] !== undefined ? stationScores[st.id] : 0;
+                const percentage = Math.round((score / st.questions.length) * 100);
+
+                let btnHtml = isCompleted
+                    ? `<button onclick="printStationCert(${st.id})" style="background: var(--success); width: auto; font-size: 0.9rem;">طباعة وبطاقة المهارات 🖨️</button>`
+                    : `<button disabled style="background: #475569; width: auto; font-size: 0.9rem; cursor: not-allowed;">غير مكتملة 🔒</button>`;
+
+                listContainer.innerHTML += `
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border-right: 4px solid ${isCompleted ? 'var(--success)' : '#475569'};">
+                        <div style="text-align: right;">
+                            <h3 style="margin: 0; color: var(--text-color);">${st.title}</h3>
+                            <div style="font-size: 0.9rem; color: #cbd5e1; margin-top: 5px;">
+                                النتيجة: ${percentage}% | النقاط: ${score}/${st.questions.length}
+                            </div>
+                        </div>
+                        <div>
+                            ${btnHtml}
+                        </div>
+                    </div>
+                `;
+            });
+            showScreen('station-certs-menu-screen');
+        }
+
+        window.printStationCert = function (stationId) {
+            const st = stationsData[stationId];
+            const score = stationScores[st.id];
+            const percentage = Math.round((score / st.questions.length) * 100);
+
+            document.getElementById('station-cert-title').innerText = st.title;
+            document.getElementById('station-cert-name').innerText = playerName;
+            document.getElementById('station-cert-score').innerText = percentage;
+            document.getElementById('station-cert-correct').innerText = score;
+            document.getElementById('station-cert-total').innerText = st.questions.length;
+            document.getElementById('station-cert-date').innerText = new Date().toLocaleDateString('ar-SA');
+            document.getElementById('station-cert-qr').innerText = `${playerName.replace(/ /g, '_')}_ST${stationId}_${percentage}PCT`;
+
+            // حساب الأهداف المتقنة والمفقودة لهذة المحطة فقط
+            const masteredList = document.getElementById('station-cert-mastered');
+            const needsWorkList = document.getElementById('station-cert-needs-work');
+            masteredList.innerHTML = '';
+            needsWorkList.innerHTML = '';
+
+            let hasNeedsWork = false;
+
+            // تحديد جميع الـ objectives المتعلقة بهذه المحطة
+            let currentStationObjectives = new Set();
+            st.questions.forEach(q => {
+                if (q.objectiveId) currentStationObjectives.add(q.objectiveId);
+            });
+
+            currentStationObjectives.forEach(objId => {
+                const data = objectiveScores[objId];
+                const info = objectivesData[objId];
+                if (data && info) {
+                    const objPercentage = (data.correct / data.total) * 100;
+                    if (objPercentage >= 80) {
+                        masteredList.innerHTML += `<li>✅ ${info.title} (${Math.round(objPercentage)}%)</li>`;
+                    } else {
+                        needsWorkList.innerHTML += `<li class="needs-work-item">❌ ${info.title}</li>`;
+                        hasNeedsWork = true;
+                    }
+                }
+            });
+
+            if (masteredList.innerHTML === '') masteredList.innerHTML = '<li style="color:#64748b;">لا يوجد تقييم متاح</li>';
+            if (needsWorkList.innerHTML === '') needsWorkList.innerHTML = '<li style="color:#64748b;">لا توجد مهارات مفقودة بحمد الله</li>';
+
+            // إظهار زر ورقة العمل إذا كانت هناك مهارات مفقودة
+            const worksheetBtn = document.getElementById('worksheet-btn-cert');
+            if (worksheetBtn) {
+                worksheetBtn.style.display = hasNeedsWork ? 'block' : 'none';
+            }
+
+            showScreen('station-cert-print-screen');
+        }
+
+        window.generateWorksheet = function () {
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                alert("مكتبة jsPDF غير متوفرة. يرجى التحقق من اتصال الإنترنت.");
+                return;
+            }
+
+            const certName = document.getElementById('cert-name') ? document.getElementById('cert-name').innerText : '';
+            const stationName = document.getElementById('station-cert-title') ? document.getElementById('station-cert-title').innerText : 'عامة';
+
+            // محاولة جلب المهارات المفقودة من الشاشات
+            let needsWorkElements = document.querySelectorAll('#certificate-screen .needs-work li, #certificate-screen #needs-work-list li, #station-cert-print-screen .needs-work li, #station-cert-print-screen #station-cert-needs-work li');
+
+            let missingSkills = [];
+            needsWorkElements.forEach(el => missingSkills.push(el.innerText));
+
+            if (missingSkills.length === 0) {
+                alert("لم يتم العثور على مهارات تحتاج تعزيز، تهانينا!");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // إعداد الخط لدعم العربية (Basic fallback - jsPDF native requires base64 TTF for true Arabic, using simple text setup for now per request)
+            doc.addFont("Helvetica", "Helvetica", "normal");
+            doc.setFont("Helvetica");
+
+            // RTL text rendering in basic jsPDF might be reversed without a proper Arabic font/plugin, but we follow the exact user spec for layout
+            doc.setFontSize(16);
+            doc.text("Recovery Worksheet - Digital Skills", 105, 20, null, null, "center");
+
+            doc.setFontSize(12);
+            doc.text("Student Name: " + certName, 20, 40);
+            doc.text("Station: " + stationName, 20, 50);
+            doc.text("Date: " + new Date().toLocaleDateString('ar-SA'), 20, 60);
+
+            doc.setFontSize(14);
+            doc.text("Skills Needing Reinforcement:", 20, 80);
+
+            doc.setFontSize(12);
+            let y = 90;
+            missingSkills.forEach((skill, index) => {
+                // Remove HTML or extra text if present
+                let cleanSkill = skill.replace(/✅|❌/g, '').trim();
+                doc.text(`${index + 1}. ${cleanSkill}`, 25, y);
+                y += 10;
+            });
+
+            y += 10;
+            doc.setFontSize(14);
+            doc.text("Lesson Instructions:", 20, y);
+            y += 10;
+            doc.setFontSize(12);
+            doc.text("1. Review the lesson material for the mentioned skills.", 25, y);
+            y += 10;
+            doc.text("2. Complete the practical exercises on the computer.", 25, y);
+            y += 10;
+            doc.text("3. Present the output to the teacher.", 25, y);
+
+            doc.setFontSize(10);
+            doc.text("Designed and implemented by: Nouf Faisal Al-Rashidi - Al-Markaziyah Girls School, Hail", 105, 280, null, null, "center");
+
+            let safeStationName = stationName.replace(/[^a-zA-Z0-9_-]/g, '_');
+            doc.save(`Recovery_Worksheet_${safeStationName}.pdf`);
         }
 
         // التهيئة
