@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مجرة المهارات الرقمية</title>
+    <style>
+        /* Transitions + hover */
+        .screen {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s ease;
+        }
+
+        .screen.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .btn {
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 12px rgba(0, 200, 255, 0.5);
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --primary: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --secondary: #1e293b;
+            --accent: #38bdf8;
+            --success: #22c55e;
+            --error: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .station-explanation {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: right;
+            max-height: 50vh;
+            overflow-y: auto;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .station-explanation::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .station-explanation::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .station-explanation p {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+            margin: 10px;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+        }
+
+        .stations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .station-card {
+            background: var(--secondary);
+            padding: 30px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .station-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .station-card.completed {
+            opacity: 0.6;
+            cursor: default;
+            pointer-events: none;
+            border-color: var(--success);
+        }
+
+        .station-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .option {
+            background: var(--secondary);
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .option:hover {
+            border-color: var(--accent);
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.2);
+        }
+
+        .option.correct {
+            border-color: var(--success);
+            background: rgba(34, 197, 94, 0.2);
+        }
+
+        .option.wrong {
+            border-color: var(--error);
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        #score-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin-top: 20px;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-height: 30px;
+            line-height: 1.5;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            height: 25px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 0%;
+            transition: width 0.4s ease-in-out;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        /* تأثير النجوم في الخلفية */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0.2;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                margin: 0;
+                padding: 0;
+            }
+
+            .stars {
+                display: none !important;
+            }
+
+            .container {
+                box-shadow: none !important;
+                background: white !important;
+                border: none !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .screen {
+                display: none !important;
+            }
+
+            #certificate-screen {
+                display: block !important;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                border: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="stars" id="stars"></div>
+
+    <div class="container">
+        <div id="user-profile"
+            style="display:none; text-align:right; margin-bottom: 15px; font-size: 1.1rem; color: var(--accent); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+            👤 الكابتن: <strong id="display-name"></strong>
+        </div>
+
+        <!-- الشاشة الرئيسية -->
+        <div id="home-screen" class="screen active">
+            <h1>🚀 مجرة المهارات الرقمية</h1>
+            <p>مرحباً بك في رحلة استكشاف الفضاء الرقمي! أدخل اسمك لبدء المهمة.</p>
+            <input type="text" id="player-name-input" placeholder="اسمك هنا..."
+                style="padding: 12px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-size: 1.2rem; border: none; margin-bottom: 20px; width: 80%; max-width: 300px; text-align: center;">
+            <br>
+            <button onclick="startGame()">ابدأ الرحلة 🛸</button>
+        </div>
+
+        <!-- شاشة المحطات -->
+        <div id="stations-screen" class="screen">
+            <button onclick="goBack('home-screen')"
+                style="background: transparent; color: #cbd5e1; border: 1px solid #cbd5e1; margin-bottom: 20px; width: auto; padding: 5px 15px;">↩
+                رجوع</button>
+            <h2>محطات الفضاء</h2>
+            <p>اختر محطة للبدء، يجب إكمال جميع المحطات!</p>
+            <div id="score-display">النقاط: <span id="current-score">0</span> / <span id="max-score">13</span></div>
+            <div class="stations-grid">
+                <div class="station-card" id="card-0" onclick="startStation(0)">
+                    <div class="station-icon">📄</div>
+                    <h3>التصميم المتقدم للمستندات</h3>
+                </div>
+                <div class="station-card" id="card-1" onclick="startStation(1)">
+                    <div class="station-icon">🌐</div>
+                    <h3>تصميم المواقع الإلكترونية</h3>
+                </div>
+                <div class="station-card" id="card-2" onclick="startStation(2)">
+                    <div class="station-icon">🎮</div>
+                    <h3>تصميم ألعاب جهاز الحاسب</h3>
+                </div>
+                <div class="station-card" id="card-3" onclick="startStation(3)">
+                    <div class="station-icon">🤖</div>
+                    <h3>المستشعرات في علم الروبوت</h3>
+                </div>
+            </div>
+            <button id="finish-btn" style="display: none; margin-top: 30px;" onclick="showFinalResult()">إنهاء الرحلة
+                🏆</button>
+        </div>
+
+        <!-- شاشة المحطة التعليمية -->
+        <div id="station-screen" class="screen">
+            <button id="station-back-btn" onclick="goBack('stations-screen')"
+                style="background: transparent; color: #cbd5e1; border: 1px solid #cbd5e1; margin-bottom: 15px; width: auto; padding: 5px 15px;">↩
+                رجوع للمحطات</button>
+            <h2 id="station-title">عنوان المحطة</h2>
+            <div class="station-explanation" id="station-info-container">
+                <div id="station-info">معلومات المحطة هنا...</div>
+            </div>
+            <div class="progress-container" id="progress-container" style="display: none;">
+                <div class="progress-bar" id="progress-bar"></div>
+                <div class="progress-text" id="progress-text">0/15</div>
+            </div>
+            <div class="question-container" style="display: none;" id="question-area">
+                <h3 id="question-text" style="color: var(--accent); margin-bottom: 10px;">السؤال؟</h3>
+                <div class="options" id="options-container">
+                    <!-- خيارات السؤال تضاف هنا عبر جافاسكريبت -->
+                </div>
+                <div class="feedback" id="feedback-msg"></div>
+                <button id="next-btn" style="display: none; width: 100%; margin: 20px 0 0 0;"
+                    onclick="nextQuestion()"></button>
+            </div>
+            <button id="start-q-btn" onclick="showQuestion()" style="width: 100%;">ابدأ التحديات 🎯</button>
+        </div>
+
+        <!-- شاشة النتيجة -->
+        <div id="result-screen" class="screen">
+            <h1>🎉 اكتملت الرحلة يا <span id="final-name"></span>!</h1>
+            <p>لقد أنهيت استكشاف جميع محطات المجرة.</p>
+            <h2>النتيجة الإجمالية: <span id="final-score" style="color: var(--accent);">0</span> من <span
+                    id="final-total-score">13</span></h2>
+            <div id="station-scores-breakdown"
+                style="margin-bottom: 20px; text-align: right; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; display: none;">
+            </div>
+            <p id="final-message"></p>
+
+            <div id="leaderboard-container"
+                style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                <h3 style="color: var(--primary); margin-top: 0; text-align: center;">🏆 لوحة الصدارة (أفضل 10)</h3>
+                <table
+                    style="width: 100%; border-collapse: collapse; text-align: center; color: white; font-size: 0.9rem;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                            <th style="padding: 8px;">#</th>
+                            <th>الاسم</th>
+                            <th>النقاط</th>
+                            <th>التاريخ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body"></tbody>
+                </table>
+            </div>
+
+            <button id="cert-btn-display" onclick="showCertificate()"
+                style="background: var(--primary); margin-bottom: 10px; width: 100%; display: none;">📜
+                عرض الشهادة للطباعة</button>
+            <button onclick="goBack('stations-screen')"
+                style="background: transparent; color: #cbd5e1; border: 1px solid #cbd5e1; margin-bottom: 10px; width: 100%;">↩
+                تصفح المحطات المنجزة</button>
+            <button onclick="resetGame()" style="background: var(--error); width: 100%;">مسح التقدم والبدء من جديد
+                🔄</button>
+        </div>
+
+        <!-- شاشة الشهادة -->
+        <div id="certificate-screen" class="screen"
+            style="background: white; color: black; border-radius: 15px; padding: 40px; text-align: center; border: 10px solid var(--primary);">
+            <div style="border: 2px dashed var(--accent); padding: 30px; border-radius: 10px;">
+                <h1 style="color: var(--primary); font-size: 2.5rem; margin-bottom: 10px;">شهادة إنجاز 🎓</h1>
+                <h3 style="color: #475569; margin-top: 0;">مجرة المهارات الرقمية</h3>
+                <p style="font-size: 1.5rem; margin: 30px 0;">يُشهد بأن البطل / البطلة</p>
+                <h2 id="cert-name"
+                    style="color: var(--accent); font-size: 2.2rem; border-bottom: 2px solid var(--accent); display: inline-block; padding-bottom: 5px;">
+                    اسم الطالب</h2>
+                <p style="font-size: 1.2rem; margin: 30px 0;">قد أتم بنجاح رحلة استكشاف الفضاء الرقمي واجتاز جميع
+                    المحطات التعليمية بنسبة إنجاز:</p>
+                <h1 id="cert-percentage" style="color: var(--success); font-size: 3rem; margin: 10px 0;">100%</h1>
+                <p style="font-size: 1.2rem; margin-top: 0;">بمجموع نقاط <strong id="cert-score"></strong> من أصل
+                    <strong id="cert-max"></strong> الإجمالي
+                </p>
+                <br>
+                <div
+                    style="display: flex; justify-content: space-between; margin-top: 40px; font-size: 1.1rem; font-weight: bold; border-top: 2px solid #e2e8f0; padding-top: 20px;">
+                    <div>تاريخ الإصدار: <span id="cert-date"></span></div>
+                    <div>القائد الفضائي: معلمك</div>
+                </div>
+            </div>
+            <div class="no-print"
+                style="margin-top: 30px; display: flex; gap: 10px; justify-content: center; flex-direction: column;">
+                <button onclick="window.print()" style="background: var(--success); width: 100%;">�️ التصدير كـ PDF /
+                    طباعة</button>
+                <button onclick="goBack('result-screen')" style="background: #64748b; width: 100%;">↩ رجوع
+                    للنتائج</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // بيانات الأهداف التعلّمية والأنشطة العلاجية
+        const objectivesData = {
+            "obj1_1": {
+                title: "إنشاء جداول وتنسيقها",
+                unit: "التصميم المتقدم للمستندات",
+                reason: "عدم إلمام كافٍ بخطوات إدراج الجداول وأدوات التنسيق الأساسية.",
+                remedialActivity: "1. افتح برنامج Word.\n2. من تبويب (إدراج Insert)، اختر (جداول Tables) وحدد شبكة 3x3.\n3. من تبويب (تصميم الجدول)، اختر النمط المناسب وطبّق (تظليل) على الصف الأول.",
+                questions: [
+                    { type: "mcq", question: "لإدراج جدول في برنامج Word، نذهب أولاً إلى تبويب:", options: ["الشريط الرئيسي", "تخطيط", "إدراج (Insert)", "عرض"], answer: 2 },
+                    { type: "mcq", question: "يتم إضافة لون مميز لخلفية خلايا الجدول باستخدام أداة:", options: ["اتجاه النص", "تظليل (Shading)", "المسطرة", "إدراج صورة"], answer: 1 },
+                    { type: "tf", question: "الجدول عبارة عن شبكة من الصفوف والأعمدة المتقاطعة.", options: ["صح", "خطأ"], answer: 0 },
+                    { type: "mcq", question: "أين نجد خيارات تغيير حدود الجدول (Borders)؟", options: ["تبويب تصميم الجدول", "تبويب إدراج", "الرأس والتذييل", "نافذة البحث واستبدال"], answer: 0 },
+                    { type: "tf", question: "يمكنك إنشاء جدول بأبعاد مختلفة مثل 5 أعمدة و 6 صفوف.", options: ["صح", "خطأ"], answer: 0 }
+                ]
+            },
+            "obj1_2": {
+                title: "تحرير الجداول وتنسيق النص",
+                unit: "التصميم المتقدم للمستندات",
+                reason: "صعوبة في إضافة/حذف الأعمدة والصفوف وإجراء التحديدات أو تعديل التباعد.",
+                remedialActivity: "1. في جدول موجود، اضغط كليك يمين واختر (إدراج -> إدراج صف أسفل).\n2. حدد الجدول كاملًا من أيقونة الزاوية.\n3. اذهب لتبويب (تخطيط Layout) وجرب أداة (اتجاه النص Alignment).",
+                questions: [
+                    { type: "mcq", question: "لإضافة صف جديد فوق الصف الحالي في الجداول:", options: ["نحذف الجدول", "نختار (إدراج صفوف لأعلى) من قائمة تخطيط", "نغير حجم الصفحة", "نضغط على المسطرة"], answer: 1 },
+                    { type: "tf", question: "لا يمكن الاستفادة من ميزة (الاحتواء التلقائي AutoFit) لضبط حجم الجدول آلياً.", options: ["صح", "خطأ"], answer: 1 },
+                    { type: "mcq", question: "كيف نحدد عمودًا بالكامل في الجدول؟", options: ["الضغط على أول كلمة فيه", "من تبويب (تخطيط) اختيار (تحديد -> تحديد عمود)", "تصغير المتصفح", "حذف الصفوف"], answer: 1 },
+                    { type: "tf", question: "يسمح برنامج Word بمحاذاة النص داخل الخلية لتكون في المنتصف تماماً.", options: ["صح", "خطأ"], answer: 0 },
+                    { type: "mcq", question: "لتغيير اتجاه قراءة النص داخل الخلية ليصبح عمودياً، نستخدم:", options: ["الرأس والتذييل", "أداة اتجاه النص في تبويب التخطيط", "تظليل لون الخط", "أداة المسطرة"], answer: 1 }
+                ]
+            },
+            "obj2_1": {
+                title: "تخطيط وبناء المواقع الإلكترونية",
+                unit: "تصميم المواقع الإلكترونية",
+                reason: "يحتاج لمراجعة المفاهيم المتعلقة بالشبكة العنكبوتية وصفحات الويب وأداة Google Sites الأساسية.",
+                remedialActivity: "1. ارسم شكلاً مبسطاً على ورقة لصفحة رئيسية وصفحتين فرعيتين.\n2. افتح (Google Sites).\n3. اختر قالبًا وجرب إدراج (نص) واكتب عنوان الموقع.",
+                questions: [
+                    { type: "mcq", question: "المنصة المجانية من جوجل المستخدمة لإنشاء المواقع بسهولة هي:", options: ["Google Docs", "Google Sites", "Google Maps", "Google Sheet"], answer: 1 },
+                    { type: "tf", question: "تخطيط الموقع على ورقة قبل البدء يسهل تنظيمه وتصميمه لاحقاً.", options: ["صح", "خطأ"], answer: 0 },
+                    { type: "mcq", question: "الصفحة الأهم في موقعك الإلكتروني التي ترحب بالزوار هي:", options: ["صفحة النهاية", "صفحة الروابط المعطلة", "الصفحة الرئيسة (Home Page)", "صفحة مسودات"], answer: 2 },
+                    { type: "mcq", question: "كل موقع إلكتروني يتكون في الأساس من:", options: ["تضاريس وعوائق", "نصوص مطبوعة ورقياً فقط", "مجموعة من صفحات الويب المترابطة", "مستشعرات ألوان"], answer: 2 },
+                    { type: "tf", question: "شبكة الإنترنت هي النظام المعلوماتي المترابط الذي نستدل عبره للمواقع.", options: ["صح", "خطأ"], answer: 0 }
+                ]
+            },
+            "obj2_2": {
+                title: "إدراج العناصر والربط التشعبي",
+                unit: "تصميم المواقع الإلكترونية",
+                reason: "ضعف في مهارة إدراج مكونات الموقع كالروابط التشعبية والصور وكيفية نشر الموقع.",
+                remedialActivity: "1. من موقعك في Google Sites، اختر تبويب (إدراج)، واضغط على (صورة) لرفع صورة من جهازك.\n2. ظلل كلمة واضغط أيقونة (رابط) لإنشاء رابط تشعبي.\n3. اضغط (نشر Publish).",
+                questions: [
+                    { type: "mcq", question: "نص أو أيقونة يتم النقر فوقها للانتقال الخارجي، تسمى:", options: ["الفاصل", "الرابط التشعبي (Hyperlink)", "تصحيح الخطأ", "أداة الماء"], answer: 1 },
+                    { type: "tf", question: "يمكنك إدراج صور من جهازك في موقع جوجل بكل سهولة.", options: ["صح", "خطأ"], answer: 0 },
+                    { type: "mcq", question: "ما هي الخطوة التي تحول مشروعك في مواقع جوجل إلى منصة يمكن للعامة زيارتها؟", options: ["تغيير المظهر", "النشر (Publish)", "حفظ كمسودة", "سحب المسطرة"], answer: 1 },
+                    { type: "tf", question: "يستحيل تعديل أي نص في الموقع الإلكتروني بعد عملية النشر مباشرة.", options: ["صح", "خطأ"], answer: 1 },
+                    { type: "mcq", question: "في التخطيط الجاهز بـ Google Sites، يمكنك التحكم السريع بـ:", options: ["خوادم الإنترنت المادية", "ترتيب النصوص والصور وتنسيقها بشكل جذاب وقوالب متماثلة", "لوحات مفاتيح الزوار", "اكتشاف أخطاء الحواسيب"], answer: 1 }
+                ]
+            },
+            "obj3_1": {
+                title: "أساسيات وتخطيط اللعبة",
+                unit: "تصميم ألعاب جهاز الحاسب",
+                reason: "عدم التمييز بين مكونات اللعبة الرئيسية ومراحل التخطيط والتصميم الأولية.",
+                remedialActivity: "1. استخدم ورقة وقلم.\n2. اكتب فكرة لعبة بسيطة: (الهدف: جمع 5 نجوم. الشخصية: روبوت، العوائق: جدران).\n3. ارسم مسار اللعبة واشرح القواعد.",
+                questions: [
+                    { type: "mcq", question: "ما هو المكون الذي يحدد ما المسموح لللاعب فعله وما هو ممنوع؟", options: ["عالم اللعبة", "قواعد اللعبة", "اختبار اللعبة", "الشخصية الثانوية"], answer: 1 },
+                    { type: "tf", question: "خطوة (تصميم النموذج الأولي) تعتبر من الخطوات المهمة لاختصار وقت التنفيذ وتجنب التعقيد.", options: ["صح", "خطأ"], answer: 0 },
+                    { type: "mcq", question: "الشخصيات الرئيسة في اللعبة تعني:", options: ["ديكور الخلفية الهادئة", "آلية حفظ المستند", "الكائنات التي يتحكم ويتفاعل معها اللاعب", "جميع ما سبق"], answer: 2 },
+                    { type: "tf", question: "عالم اللعبة يشمل الأصوات والإضاءة والتضاريس المحيطة.", options: ["صح", "خطأ"], answer: 0 },
+                    { type: "mcq", question: "المرحلة الأولى لتصميم أي لعبة هي:", options: ["تسويقها فوراً", "البحث عن الفكرة المناسبة", "توزيع المهام ببيئة العمل", "استخدام مستشعر الموجات"], answer: 1 }
+                ]
+            },
+            "obj3_2": {
+                title: "استخدام بيئة Kodu Game Lab",
+                unit: "تصميم ألعاب جهاز الحاسب",
+                reason: "ضعف مفاهيمي حول أدوات برنامج كودو لإنشاء التضاريس والآليات البرمجية المرئية.",
+                remedialActivity: "1. افتح بيئة Kodu Game Lab عبر جهازك.\n2. اختر (أداة الرفع/الخفض) لصنع تل صغير، و(أداة الماء) لصنع بحيرة.\n3. أضف كائن العربة (Rover) مستخدماً (أداة الكائن).",
+                questions: [
+                    { type: "mcq", question: "أي أداة يمكن استخدامها لإضافة البحيرات والأنهار في بيئة كودو؟", options: ["الممحاة", "أداة الماء", "أداة الكائن", "تحديد الأعمدة"], answer: 1 },
+                    { type: "tf", question: "يتطلب برنامج Kodu كتابة أكواد نصية بلغة جافا سكريبت أو سيشارب.", options: ["صح", "خطأ"], answer: 1 },
+                    { type: "mcq", question: "أداة تستخدم لإنشاء الجبال والمرتفعات بالتضاريس:", options: ["أداة الكائنات المتعددة", "أداة الرفع / الخفض", "شريط عنوان المستند", "أداة نشر المواقع"], answer: 1 },
+                    { type: "mcq", question: "أهم مرحلة بعد الانتهاء من برمجة بيئة اللعبة وقبل مشاركتها للجمهور هي:", options: ["تغيير الرأس والتذييل", "زيادة الأسعار", "مرحلة (اختبار اللعبة) وتصحيحها", "حذف كافة الكائنات"], answer: 2 },
+                    { type: "tf", question: "يُمكن إضافة شخصيات جاهزة لعالم اللعبة مثل العربة الجوالة عبر أداة (الكائن).", options: ["صح", "خطأ"], answer: 0 }
+                ]
+            },
+            "obj4_1": {
+                title: "أنواع مستشعرات الروبوتات",
+                unit: "المستشعرات في علم الروبوت",
+                reason: "صعوبة في تمييز أنواع المستشعرات (لون، مسافة، لمس) ووظيفة كل منها.",
+                remedialActivity: "1. ارسم روبوتاً بسيطاً.\n2. أشر بسهم لأعلى وضع (مستشعر الموجات) لاستكشاف العوائق ومقاساتها.\n3. أشر لأسفل وضع (مستشعر ألوان) لتتبع الخطوط، وتخيل استجابتهما.",
+                questions: [
+                    { type: "mcq", question: "المستشعر المعني بقياس المسافة بين الروبوت والعوائق الصلبة هو:", options: ["مستشعر الألوان", "مستشعر الموجات فوق الصوتية", "مستشعر اللمس", "المنفذ الثالث"], answer: 1 },
+                    { type: "tf", question: "تعد المستشعرات بمثابة (الحواس الصناعية) للآلة لتدرك التغيرات البيئية من حولها.", options: ["صح", "خطأ"], answer: 0 },
+                    { type: "mcq", question: "عند برمجة روبوت لتتبع مسار (خط أسود)، فإننا نعتمد أساساً على:", options: ["مستشعر الصوت", "مستشعر اللمس", "مستشعر الألوان", "سرعة الإطارات"], answer: 2 },
+                    { type: "mcq", question: "عندما ترغب باحتساب زاوية دوران الروبوت لضمان اتزانه، تستخدم:", options: ["المستشعر الضوئي", "مستشعر الجيرسكوب", "الموجات الحرارية", "زر الرجوع"], answer: 1 },
+                    { type: "tf", question: "مستشعر اللمس يتطلب تفاعلاً وتلامساً مادياً فيزيائياً ليعطي إشارة، مثل الاصطدام.", options: ["صح", "خطأ"], answer: 0 }
+                ]
+            },
+            "obj4_2": {
+                title: "برمجة وبناء المحاكاة",
+                unit: "المستشعرات في علم الروبوت",
+                reason: "يحتاج تدريباً لآلية استخدام الشروط البرمجية (إذا/وإلا) وتصحيح الأخطاء ضمن محاكي الروبوتات.",
+                remedialActivity: "1. ابحث عن (Open Roberta Lab) في المتصفح واختبر روبوت EV3.\n2. ركب لبنة (تحرك للأمام) وداخلها شرط (إذا اكتشف مستشعر مسافة عائقاً < 20 سم، فتوقف).\n3. شغّل الشاشة المرئية للمحاكي لمشاهدة التنفيذ.",
+                questions: [
+                    { type: "mcq", question: "بيئة المحاكاة التفاعلية المخصصة لتجربة برمجة روبوت EV3 تسمى:", options: ["Kodu Lab", "Word 365", "Open Roberta Lab", "Google Sites"], answer: 2 },
+                    { type: "tf", question: "الروبوت كائن ذكي جداً، ليس بحاجة لاستخدام كتل شروط (إذا - Then) ليتخذ قراراً.", options: ["صح", "خطأ"], answer: 1 },
+                    { type: "mcq", question: "لتنفيذ أمر أو حركة معينة باستمرار دون توقف نستخدم من تبويب (Control):", options: ["لبنة تكرار (Repeat)", "لبنة الصوتيات (Play)", "لبنة إنهاء العرض", "لبنة التنسيقات"], answer: 0 },
+                    { type: "tf", question: "عملية (تصحيح الخطأ Debugging) ضرورية جدًا لاكتشاف الثغرات في الأكواد البرمجية قبل النشر النهائي.", options: ["صح", "خطأ"], answer: 0 },
+                    { type: "mcq", question: "إذا برمجت الروبوت على إصدار صوتٍ بعد اصطدامه بجدار، فتكون لبنة إصدار الصوت ضمن فئة:", options: ["المستشعرات", "التكرارات الحلقية", "أحداث والإجراءات (Action)", "الرأس والتذييل"], answer: 2 }
+                ]
+            }
+        };
+
+        // البيانات
+        const stationsData = [
+            {
+                id: 0,
+                title: "محطة التصميم المتقدم للمستندات",
+                info: `
+                    <h3 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;">عنوان الدرس: التصميم المتقدم للمستندات</h3>
+                    <p style="color: #cbd5e1;"><strong>أهداف الدرس:</strong><br>
+                    • إنشاء جدول وتنسيقه باستخدام معالج النصوص.<br>
+                    • إضافة وحذف الصفوف والأعمدة.<br>
+                    • تنسيق النص في عدة أعمدة والبحث عن الكلمات واستبدالها.<br>
+                    • إضافة الرؤوس والتذييل والرموز وتطبيق أنماط جديدة.</p>
+                    
+                    <p style="color: #cbd5e1;"><strong>شرح المفاهيم الأساسية:</strong><br>
+                    • <em style="color: var(--accent);">الجدول:</em> يتكون من شبكة من الصفوف والأعمدة لجمع المعلومات بوضوح.<br>
+                    • <em style="color: var(--accent);">الرأس والتذييل (Header & Footer):</em> أجزاء في أعلى وأسفل الصفحة لعرض معلومات كالعنوان وأرقام الصفحات.<br>
+                    • <em style="color: var(--accent);">المسافة البادئة (Indent):</em> مسافة تنظم بداية الفقرة أو السطر الأول باستخدام المسطرة.</p>
+                    
+                    <p style="color: #cbd5e1;"><strong>خطوات التطبيق أو التنفيذ:</strong><br>
+                    1. <em style="color: var(--accent);">إنشاء جدول:</em> من علامة التبويب (إدراج Insert)، اضغط على (جداول Tables).<br>
+                    2. <em style="color: var(--accent);">تنسيق الجدول:</em> من (تصميم الجدول Table Design)، يمكنك تغيير (التظليل Shading) أو (الحدود Borders).<br>
+                    3. <em style="color: var(--accent);">البحث والاستبدال:</em> استخدم اختصار (Ctrl + H) أو عبر علامة التبويب (الشريط الرئيسي Home) للعثور على كلمة واستبدالها.</p>
+                    
+                    <p style="color: #cbd5e1;"><strong>أمثلة من الكتاب:</strong><br>
+                    استخدام الجداول لتنظيم البيانات مثل جدول مشروع قطار الرياض. وإضافة مسافة بادئة للنص عبر تحريك علامات المسطرة لتنسيق شكل المستند. إضافة الرموز (Symbols) لاختصار النصوص وتحسين دلالاتها مثل الرموز الرياضية.</p>
+                `,
+                questions: [
+                    {
+                        type: "mcq",
+                        question: "لإضافة مسافة بادئة للسطر الأول في فقرتك، يمكنك استخدام:",
+                        options: ["المسطرة", "الرأس والتذييل", "الفأرة فقط", "الرموز"],
+                        answer: 0,
+                        explanation: "تتيح لك المسطرة في معالجات النصوص التحكم الدقيق بمسافات البادئة للفقرات والأسطر الأولى."
+                    },
+                    {
+                        type: "mcq",
+                        question: "كيف يتم إدراج جدول في برنامج معالج النصوص (Microsoft Word)؟",
+                        options: ["من تبويب (الشريط الرئيسي) واختيار (خط)", "من تبويب (عرض) واختيار (مسطرة)", "من تبويب (إدراج Insert) واختيار (جداول Tables)", "من تبويب (تخطيط) واختيار (أعمدة)"],
+                        answer: 2,
+                        explanation: "لإدراج جدول، يجب التوجه دائماً إلى علامة التبويب المخصصة للإضافات وهي 'إدراج' ثم 'جداول'."
+                    },
+                    {
+                        type: "mcq",
+                        question: "من الطرق المستخدمة لاختصار إدراج رموز غير موجودة في لوحة المفاتيح بشكل مباشر:",
+                        options: ["تغيير لغة العرض", "استخدام تبويب (إدراج) ثم (رموز Symbols)", "تغيير إعداد الهامش", "نسخها كصورة فقط"],
+                        answer: 1,
+                        explanation: "يوفر برنامج معالج النصوص مكتبة للرموز الخاصة مثل الرموز الرياضية عبر قائمة (إدراج -> رموز)."
+                    },
+                    {
+                        type: "mcq",
+                        question: "ما هو الاختصار السريع (Shortcut) لفتح نافذة البحث والاستبدال للكلمات في المستند؟",
+                        options: ["Ctrl + C", "Ctrl + P", "Ctrl + H", "Ctrl + V"],
+                        answer: 2,
+                        explanation: "يستخدم الاختصار Ctrl + H لفتح نافذة (البحث والاستبدال Find and Replace) بشكل سريع ومباشر."
+                    },
+                    {
+                        type: "mcq",
+                        question: "أين تقع ميزة (تظليل Shading) وميزة (حدود Borders) للجدول؟",
+                        options: ["تبويب التخطيط", "تبويب إدراج", "تبويب تصميم الجدول (Table Design)", "تبويب العرض"],
+                        answer: 2,
+                        explanation: "يتم تخصيص مظهر وشكل الجدول مثل تغيير الألوان والحدود من خلال تبويب (تصميم الجدول)."
+                    },
+                    {
+                        type: "mcq",
+                        question: "المنطقة المخصصة لطباعة رقم الصفحة بانتظام أسفل المستند تسمى:",
+                        options: ["الرأس (Header)", "الخلايا", "التذييل (Footer)", "الهوامش العلوية"],
+                        answer: 2,
+                        explanation: "التذييل هو الجزء السفلي للمستند والذي يستخدم بشكل شائع لعرض أرقام الصفحات ومعلومات متكررة."
+                    },
+                    {
+                        type: "tf",
+                        question: "يستحيل لبرنامج معالج النصوص ضبط حجم أعمدة الجدول لتتناسب مع طول النص تلقائياً.",
+                        options: ["صح", "خطأ"],
+                        answer: 1,
+                        explanation: "هذا خاطئ، حيث تتيح خاصية 'الاحتواء التلقائي' (AutoFit) ضبط مساحة الأعمدة بناءً على المحتوى."
+                    },
+                    {
+                        type: "tf",
+                        question: "يمكن تغيير اتجاه النص داخل إحدى خلايا الجدول ليصبح عامودياً بدلاً من أفقي.",
+                        options: ["صح", "خطأ"],
+                        answer: 0,
+                        explanation: "العبارة صحيحة، يوفر خيار (اتجاه النص) من قائمة التخطيط تغيير طريقة عرض التنسيق لتبدو عمودية."
+                    },
+                    {
+                        type: "mcq",
+                        question: "ما الأداة التي تساعد على التحكم ببداية ونهاية أسطر الفقرات بدقة تامة؟",
+                        options: ["الرأس والتذييل", "المسطرة (Ruler)", "تظليل الجدول", "إعداد الهوامش العلوية"],
+                        answer: 1,
+                        explanation: "تعرض المسطرة علامات مرئية يمكن سحبها لتطبيق مسافة بادئة للسطر الأول أو لكامل الفقرة."
+                    },
+                    {
+                        type: "tf",
+                        question: "الهدف الرئيسي من استخدام الجداول في مستند نصي هو تنظيم المعلومات والبيانات لتصبح سهلة الفهم.",
+                        options: ["صح", "خطأ"],
+                        answer: 0,
+                        explanation: "توفر الجداول شبكة مرتبة كبديل عن كتابة نصوص سردية طويلة."
+                    },
+                    {
+                        type: "mcq",
+                        question: "لإضافة صف فارغ جديد بين صفين في جدول موجود، يمكنك استخدام خيار:",
+                        options: ["تظليل (Shading)", "إدراج لأعلى أو إدراج لأسفل", "الرأس والتذييل", "حذف أعمدة"],
+                        answer: 1,
+                        explanation: "لتوسيع الجدول، توفر قائمة التخطيط (Layout) خيارات إدراج صفوف بالأعلى والأسفل وأعمدة باليمين واليسار."
+                    },
+                    {
+                        type: "tf",
+                        question: "ميزة (التباعد Line Spacing) تستخدم لتغيير المسافة العمودية بين الأسطر داخل الفقرة الواحدة.",
+                        options: ["صح", "خطأ"],
+                        answer: 0,
+                        explanation: "صحيح، تباعد الأسطر يساعد في تحسين مقروئية النص ومنع تداخل الكلمات بين السطور المتقاربة."
+                    },
+                    {
+                        type: "mcq",
+                        question: "أداة (المدقق الإملائي والنحوي) في برنامج وورد تساعد المستخدم على:",
+                        options: ["حذف كافة الصور تلقائياً", "استبدال جميع الكلمات", "اكتشاف الأخطاء اللغوية واقتراح تصحيحات لها", "إضافة حدود للجدول"],
+                        answer: 2,
+                        explanation: "يقوم المدقق بمراجعة كلماتك واقتراح خيارات صحيحة لأي أخطاء إملائية أو نحوية يكتشفها."
+                    },
+                    {
+                        type: "mcq",
+                        question: "كيف تقوم بتنسيق نص محدد ليظهر بشكل مائل (Italic)؟",
+                        options: ["الضغط على أيقونة (I) من قائمة الشريط الرئيسي", "الضغط على أيقونة (U)", "إدراج صورة بجانب النص", "تغيير هوامش الصفحة"],
+                        answer: 0,
+                        explanation: "تمثل أيقونة (I) اختصارًا لكلمة Italic التي تقوم بإمالة النص لجذب الانتباه أو تمييز المصطلحات."
+                    },
+                    {
+                        type: "tf",
+                        question: "يمكنك إدراج صور من الإنترنت (Online Pictures) مباشرة إلى مستندك دون تحميلها مسبقاً لجهازك.",
+                        options: ["صح", "خطأ"],
+                        answer: 0,
+                        explanation: "توفر ميزة إدراج الصور عبر الإنترنت محرك بحث مدمج لجلب الصور فوراً للمستند."
+                    }
+                ]
+            },
+            {
+                id: 1,
+                title: "محطة تصميم المواقع الإلكترونية",
+                info: `
+                    <h3 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;">عنوان الدرس: تصميم المواقع الإلكترونية</h3>
+                    <p style="color: #cbd5e1;"><strong>أهداف الدرس:</strong><br>
+                    • ماهية الشبكة العنكبوتية والمواقع والصفحات الإلكترونية المتعددة وتخطيطها.<br>
+                    • إضافة وتعديل الصور والنصوص فيها.<br>
+                    • تعديل تصميم موقع إلكتروني بالكامل.<br>
+                    • نشر موقع إلكتروني ومشاركته.</p>
+                    
+                    <p style="color: #cbd5e1;"><strong>شرح المفاهيم الأساسية:</strong><br>
+                    • <em style="color: var(--accent);">الشبكة الإلكترونية العالمية:</em> نظام معلوماتي مترابط للوصول للمواقع الإلكترونية.<br>
+                    • <em style="color: var(--accent);">الموقع الإلكتروني:</em> مجموعة من الصفحات الإلكترونية المترابطة، يتم الوصول إليه بكتابة عنوانه في المتصفح.<br>
+                    • <em style="color: var(--accent);">الصفحة الرئيسة:</em> الصفحة الأولى والأكثر أهمية في الموقع، وتحتوي روابط للصفحات الأخرى.<br>
+                    • <em style="color: var(--accent);">الروابط التشعبية (Hyperlinks):</em> نصوص أو أيقونات تنقلك إلى صفحة إنترنت أخرى عند الضغط عليها.</p>
+                    
+                    <p style="color: #cbd5e1;"><strong>خطوات التطبيق أو التنفيذ:</strong><br>
+                    1. <em style="color: var(--accent);">تخطيط الموقع:</em> رسم الهيكل التصميمي للموقع ومعرفة مكوناته الرئيسة.<br>
+                    2. <em style="color: var(--accent);">استخدام مواقع جوجل:</em> أداة لإنشاء وتصميم مواقع ويب بصورة مبسطة (Google Sites).<br>
+                    3. <em style="color: var(--accent);">إضافة العناصر:</em> تتيح المنصة إدراج (نصوص، صور، روابط تشعبية، أيقونات).<br>
+                    4. <em style="color: var(--accent);">نشر الموقع (Publish):</em> للحصول على رابط نشط يُمكِّن المستخدمين من تصفح وزيارة موقعك.</p>
+                    
+                    <p style="color: #cbd5e1;"><strong>أمثلة من الكتاب:</strong><br>
+                    تصميم وبناء موقع للترويج لمشروع جبل 'تروجينا' في مدينة نيوم كأنموذج تطبيقي، وإضافة صفحات فرعية تُنظم المحتوى في الموقع لسهولة تنقل القراء.</p>
+                `,
+                questions: [
+                    {
+                        type: "mcq",
+                        question: "أحد مكونات الإنترنت يتكون من أجهزة حاسب مترابطة ومجموعة من المواقع الإلكترونية:",
+                        options: ["الشبكة الإلكترونية العالمية", "لغة تكويد النص التشعبي HTML", "متصفح الويب", "الصفحة الرئيسة"],
+                        answer: 0,
+                        explanation: "الشبكة الإلكترونية العالمية (WWW) هي نظام معلوماتي مترابط يسهل الوصول للمواقع."
+                    },
+                    {
+                        type: "mcq",
+                        question: "تعتبر الصفحة الأكثر أهمية في أي موقع إلكتروني لأنها بوابة الزوار الأولى للموقع:",
+                        options: ["صفحة التواصل", "الصفحة الرئيسة", "الصفحة المخفية", "الصفحة الفرعية"],
+                        answer: 1,
+                        explanation: "الصفحة الرئيسة (Home Page) تمثل واجهة الموقع وعادة تحوي أهم الروابط."
+                    },
+                    {
+                        type: "mcq",
+                        question: "ما هي الأداة المجانية التي تم شرحها في الدورة والمقدمة من شركة Google لإنشاء مواقع مبسطة؟",
+                        options: ["Google Drive", "Google Docs", "Google Sites (مواقع جوجل)", "Google Slides"],
+                        answer: 2,
+                        explanation: "أداة (Google Sites) توفر بيئة جاهزة ونماذج لإنشاء موقع ويب بسهولة."
+                    },
+                    {
+                        type: "mcq",
+                        question: "كيف يمكن إدراج صورة في أداة مواقع جوجل ليظهر طابع بصري للزوار؟",
+                        options: ["من علامة تبويب (إدراج) ثم (صور)", "من أداة (رفع التضاريس)", "عبر إعادة كتابة كود HTML بالكامل", "من تبويب (تنسيق الجداول)"],
+                        answer: 0,
+                        explanation: "تحتوي واجهة التصميم على قائمة (إدراج) تسمح بسحب الصور أو رفعها بسهولة للموقع."
+                    },
+                    {
+                        type: "mcq",
+                        question: "نص أو صورة ينقلك الضغط عليه إلى صفحة إلكترونية أخرى يُسمى بـ:",
+                        options: ["رقم الصفحة", "مسافة بادئة", "تظليل", "رابط تشعبي (Hyperlink)"],
+                        answer: 3,
+                        explanation: "الترابط بين الصفحات يتم بصورة رئيسية عبر (الروابط التشعبية)."
+                    },
+                    {
+                        type: "mcq",
+                        question: "الخطوة النهائية لمشاركة الموقع الإلكتروني ليكون متاحاً لجميع الزوار هي:",
+                        options: ["إنشاء النموذج", "نشر الموقع (Publish)", "نسخ الصورة", "تعديل الجدول"],
+                        answer: 1,
+                        explanation: "خطوة (النشر) هي المرحلة التي تُخرج فيها عملك للجمهور وتحوله من مسودة إلى موقع إلكتروني قابل للتصفح."
+                    },
+                    {
+                        type: "tf",
+                        question: "من الجيد والمهم تخصيص وقت لرسم مخطط تصميمي أولي للموقع قبل البدء ببرمجته.",
+                        options: ["صح", "خطأ"],
+                        answer: 0,
+                        explanation: "صحيح، وضع هيكلة واضحة على خطة ورقية أو مسودة يوفر الوقت ويرتب أولويات وتوزيع محتوى الموقع."
+                    },
+                    {
+                        type: "tf",
+                        question: "في أداة مواقع الشبكة، بمجرد الانتهاء من نشر الموقع الإلكتروني، يستحيل تعديل بياناته للأبد.",
+                        options: ["صح", "خطأ"],
+                        answer: 1,
+                        explanation: "خطأ، بإمكانك العودة لوضع التحرير كـ(مُشرِف) وتعديل المحتوى ثم نشره مجدداً."
+                    },
+                    {
+                        type: "mcq",
+                        question: "العنصر البرمجي الذي يسمح بربط صفحة إلكترونية بأخرى لتسهيل التنقل يُسمى:",
+                        options: ["النص المائل", "الصور المتحركة", "الرابط التشعبي (Hyperlink)", "تنسيق الفقرة"],
+                        answer: 2,
+                        explanation: "الكلمة المسطرة أو الأيقونة التي يمكن النقر فوقها وتنقلك لمحتوى آخر."
+                    },
+                    {
+                        type: "tf",
+                        question: "الصفحة الرئيسة (Home Page) هي واجهة الموقع والموطن الأساسي الذي تتفرع منه بقية الأقسام.",
+                        options: ["صح", "خطأ"],
+                        answer: 0,
+                        explanation: "الصفحة الرئيسة هي الأولى والأكثر أهمية دائماً للترحيب بالزوار وتوجيههم."
+                    },
+                    {
+                        type: "tf",
+                        question: "تخطيط موقع إلكتروني على الورق يعتبر مضيعة للوقت ومن الأفضل البدء في التصميم مباشرة.",
+                        options: ["صح", "خطأ"],
+                        answer: 1,
+                        explanation: "العكس هو الصحيح، إنشاء مخطط تصميمي يوضح مكونات الموقع وتوزيعها يسرع من العمل ويرتب الأفكار."
+                    },
+                    {
+                        type: "mcq",
+                        question: "يتكون (تخطيط الصفحة Layout) في مواقع جوجل من قوالب جاهزة تُستخدم لتنظيم:",
+                        options: ["الروابط والصور والنصوص", "لغات البرمجة المعقدة", "ملفات النظام المخفية", "حجم الشاشة الخاص بالمتصفح فقط"],
+                        answer: 0,
+                        explanation: "القوالب (التخطيطات) الجاهزة في المنصة توفر هيكلة جذابة وموزعة بشكل متناسق لعناصر الصفحة مثل النصوص والصور."
+                    },
+                    {
+                        type: "mcq",
+                        question: "في أداة مواقع جوجل، أين يمكنك حفظ عملك وضمان عدم ضياعه أثناء التصميم؟",
+                        options: ["بالنقر على أيقونة حفظ كمسودة في المتصفح فقط", "مواقع جوجل تحفظ العمل تلقائياً في حساب Google Drive المرتبط", "بنقل الكود إلى ملف نصي آخر", "بإرساله عبر البريد الإلكتروني بعد كل خطوة"],
+                        answer: 1,
+                        explanation: "من ميزات Google Sites أنها تخزن وتُجري عمليات الحفظ السحابية بصورة تلقائية في مستندات Google Drive بفضل التخزين السحابي."
+                    },
+                    {
+                        type: "tf",
+                        question: "يمكنك تغيير 'المظهر' (Theme) الخاص بموقعك الإلكتروني بالكامل بضغطة زر واحدة في أداة مواقع جوجل.",
+                        options: ["صح", "خطأ"],
+                        answer: 0,
+                        explanation: "صحيح، تتيح لك أداة المظاهر تغيير كل الألوان، ونوع الخطوط، والشكل الجمالي للموقع بمجرد اختيار قالب مظهر مختلف."
+                    },
+                    {
+                        type: "mcq",
+                        question: "إذا كنت ترغب بالترويج لمشروع ضخم مثل (جبل تروجينا في نيوم)، فإن الطريقة الأفضل والأكثر وصولاً للجمهور العالمي هي عبر:",
+                        options: ["استخدام معالج النصوص كجدول داخلي فقط", "بناء ونشر 'موقع إلكتروني' تفاعلي", "طباعة ورقة مصغرة للحي", "كتابة رسائل قصيرة عبر الهاتف الجوال"],
+                        answer: 1,
+                        explanation: "الشبكة الإلكترونية والمواقع هي الوسيلة الأمثل لعرض الصور والمظاهر الترويجية لجميع زوار الشبكة بسهولة وشمولية."
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "محطة تصميم ألعاب جهاز الحاسب",
+                info: `
+                    <h3 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;">عنوان الدرس: تصميم ألعاب جهاز الحاسب</h3>
+                    <p style="color: #cbd5e1;"><strong>أهداف الدرس:</strong><br>
+                    • المكونات الرئيسة للعبة.<br>
+                    • خطوات تصميم اللعبة.<br>
+                    • إنشاء لعبة ومحاكاة باستخدام بيئة (Kodu Game Lab).<br>
+                    • إضافة الكائنات والتضاريس للعبة وبرمجتها.</p>
+                    
+                    <p style="color: #cbd5e1;"><strong>شرح المفاهيم الأساسية:</strong><br>
+                    • <em style="color: var(--accent);">عالم اللعبة:</em> يشمل التضاريس والرسومات والصوت والبيئة التفاعلية.<br>
+                    • <em style="color: var(--accent);">الشخصيات الرئيسة:</em> هي الكائنات التي يتحكم بها اللاعب بشكل مباشر أو يتفاعل معها.<br>
+                    • <em style="color: var(--accent);">قواعد اللعبة:</em> مجموعة من التعليمات التي توضح كيفية لعب اللعبة وما يمكنك فعله وما لا يمكنك فعله.<br>
+                    • <em style="color: var(--accent);">التحديات:</em> العقبات والصعوبات التي تصعب من مهام اللاعب في اللعبة وتزيد من المتعة.<br>
+                    • <em style="color: var(--accent);">التحكم:</em> الطريقة والأدوات التي تتحكم بها في شخصيتك وحركتك وإجراءاتك.</p>
+                    
+                    <p style="color: #cbd5e1;"><strong>خطوات إعداد وتنفيذ تصميم اللعبة:</strong><br>
+                    1. <em style="color: var(--accent);">الفكرة:</em> التفكير في فكرة من أجل لعبتك أو مشهدك.<br>
+                    2. <em style="color: var(--accent);">التخطيط للتصميم:</em> إنشاء خطة مكتوبة للعبة، بما في ذلك القصة والشخصيات وتفاصيل الآليات.<br>
+                    3. <em style="color: var(--accent);">تصميم النموذج الأولي:</em> رسم أولي بهدف الوصول للفكرة النهائية وتجنب التعقيدات غير الضرورية قبل البرمجة.<br>
+                    4. <em style="color: var(--accent);">التنفيذ:</em> إنشاء الرسومات، والمؤثرات الصوتية، وبرمجة الآليات على البرنامج.<br>
+                    5. <em style="color: var(--accent);">اختبار اللعبة:</em> للتحقق والتأكد من أنها تعمل بشكل صحيح وممتعة للعب وخالية من الأخطاء المنطقية.<br>
+                    6. <em style="color: var(--accent);">تشغيل اللعبة:</em> نشر اللعبة ومشاركتها مع أصدقائك وعائلتك.</p>
+                    
+                    <p style="color: #cbd5e1;"><strong>أمثلة تطبيقية من الكتاب:</strong><br>
+                    يتم استخدام بيئة <strong>Kodu Game Lab</strong> لإنشاء لعبة بسيطة تُدعى (العربة الجوالة Rover). يتحكم اللاعب بالعربة لجمع التفاح وتجنب الصخور. ويستخدم البرنامج أدوات مرئية سهلة مثل: <em>أداة الكائن</em> (لإضافة التفاح والصخور)، و<em>أداة رفع/خفض</em> (لعمل التلال وتغيير التضاريس الأرضية)، و<em>أداة الماء</em> (لإضافة حفر مائية وعقبات).</p>
+                `,
+                questions: [
+                    {
+                        type: "mcq",
+                        question: "من المكونات الرئيسة للعبة التي توضح كيفية لعب اللعبة وما يمكنك فعله؟",
+                        options: ["القواعد", "التضاريس", "الشخصيات الرئيسة", "الرسومات والصوت"],
+                        answer: 0,
+                        explanation: "تشرح قواعد اللعبة الشروط والتعليمات المسموحة وتحدد بيئة اللعب، مما ينظم تجربة المستخدم بشكل كامل."
+                    },
+                    {
+                        type: "mcq",
+                        question: "أي من الخطوات التالية تعتبر الخطوة الأولى في عملية تصميم اللعبة أو أي تطبيق؟",
+                        options: ["التنفيذ", "الفكرة", "اختبار اللعبة", "تصميم النموذج الأولي"],
+                        answer: 1,
+                        explanation: "أساس أي لعبة ناجحة هو إيجاد 'الفكرة' ومن ثم توثيقها والتخطيط لها."
+                    },
+                    {
+                        type: "mcq",
+                        question: "ما هو البرنامج التطبيقي المستخدم في أمثلة الكتاب لتصميم ألعاب ثلاثية الأبعاد بمرونة؟",
+                        options: ["سكراتش (Scratch)", "ماين كرافت التعليمي", "كودو (Kodu Game Lab)", "مايكروسوفت ميك كود"],
+                        answer: 2,
+                        explanation: "بيئة برمجة Kodu Game Lab من مايكروسوفت تقدم مساحة مرئية تفاعلية لتصميم الألعاب بسهولة دون كتابة أكواد برمجية معقدة."
+                    },
+                    {
+                        type: "mcq",
+                        question: "أي أداة تُستخدم لرفع أو خفض التضاريس في برنامج كودو لإنشاء التلال؟",
+                        options: ["أداة الكائن", "أداة الماء", "أداة رفع/خفض (Up/Down)", "أداة المسار"],
+                        answer: 2,
+                        explanation: "أداة الرفع والخفض تستخدم بشكل مباشر لتكوين تلال مرتفعة ومنحدرات منخفضة في بيئة وعالم اللعبة."
+                    },
+                    {
+                        type: "mcq",
+                        question: "المرحلة التي يتم فيها التأكد عملياً من أن اللعبة تعمل بشكل صحيح وممتعة للعب تسمى:",
+                        options: ["تصميم النموذج", "التنفيذ", "التخطيط", "اختبار اللعبة"],
+                        answer: 3,
+                        explanation: "خطوة 'اختبار اللعبة' تساعد في اكتشاف المشاكل والثغرات، وتحديد مدى درجة المتعة فيها قبل أن تلعبها أو تنشرها."
+                    },
+                    {
+                        type: "mcq",
+                        question: "ماذا يعني مفهوم 'الشخصيات الرئيسة' في العالم الافتراضي للعبة؟",
+                        options: ["التضاريس والمباني المحيطة", "كافة العوائق والصعوبات فقط", "الكائنات التي يتحكم بها اللاعب أو يتفاعل معها", "شروط إحراز النقاط والإنتصار"],
+                        answer: 2,
+                        explanation: "الشخصيات (مثل العربة الجوالة في مثالنا) هي العناصر المتحركة التي توجه مجرى اللعبة."
+                    },
+                    {
+                        type: "tf",
+                        question: "القواعد جزء من المكونات الرئيسة للعبة وتختلف تماماً عن مفهوم 'عالم اللعبة' الذي يقتصر على التضاريس والرسومات.",
+                        options: ["صح", "خطأ"],
+                        answer: 0,
+                        explanation: "بالفعل، عالم اللعبة يشير للإطار الحسي (بيئات مجسمة وأصوات)، بينما القواعد تمثل الإطار المنطقي الموجه."
+                    },
+                    {
+                        type: "tf",
+                        question: "بمجرد الانتهاء من برمجة اللعبة في خطوة 'التنفيذ'، يمكن نشرها وتجاهل خطوة 'الاختبار' إذا كان المبرمج متأكداً.",
+                        options: ["صح", "خطأ"],
+                        answer: 1,
+                        explanation: "هذا خاطئ تماماً. يجب ألا يتم تجاوز خطوة اختبار اللعبة مهما كانت بسيطة لحل أي أخطاء مفاجئة وتعزيز التوازن."
+                    },
+                    {
+                        type: "mcq",
+                        question: "من أهم المكونات الرئيسة للعبة جهاز الحاسب:",
+                        options: ["عالم اللعبة والشخصيات الرئيسة", "لوحة المفاتيح والفأرة فقط", "كتابة الأكواد النصية المعقدة", "منصة المحاكاة فقط"],
+                        answer: 0,
+                        explanation: "ترابط هذه المكونات (مثل العالم والشخصيات والقواعد) يبني هيكلة أي لعبة موثوقة وممتعة."
+                    },
+                    {
+                        type: "tf",
+                        question: "الهدف من مرحلة 'التخطيط للتصميم' هو إنشاء خطة متكاملة للعبة بما في ذلك القصة وتوزيع الشخصيات.",
+                        options: ["صح", "خطأ"],
+                        answer: 0,
+                        explanation: "التخطيط يسبق التنفيذ العملي، وهو بمثابة رسم خريطة طريق تحمي المبرمج من الارتباك."
+                    },
+                    {
+                        type: "mcq",
+                        question: "في لعبة العربة الجوالة (Rover)، إذا اصطدمت الشخصية الرئيسة بصخرة، ماذا يحدث لنقاط اللاعب بناءً على قواعد الدورة؟",
+                        options: ["يحصل على نقاط إضافية", "تضيء الشاشة", "يفقد نقطة واحدة", "تنتهي اللعبة فوراً"],
+                        answer: 2,
+                        explanation: "تمثل الصخور 'تحديات وعقبات'، وتتم برمجتها لخصم نقاط عند ملامستها لإضافة صعوبة للعبة."
+                    },
+                    {
+                        type: "tf",
+                        question: "بيئة Kodu Game Lab تستدعي كتابة أكواد برمجية معقدة وطويلة لإنشاء حركة بسيطة.",
+                        options: ["صح", "خطأ"],
+                        answer: 1,
+                        explanation: "خطأ، تعتمد Kodu على البرمجة المرئية بسحب كتل أوامر كـ (متى When) و(افعل Do) بدلاً من الأكواد المعقدة."
+                    },
+                    {
+                        type: "mcq",
+                        question: "ما الأداة التي يجب استخدامها لإضافة البحيرات أو الأنهار لعالم اللعبة في كودو؟",
+                        options: ["أداة المسار", "أداة الماء", "أداة الرفع والخفض", "أداة الممحاة"],
+                        answer: 1,
+                        explanation: "أداة الماء مصممة خصيصاً لإضافة مسطحات مائية تفاعلية في التضاريس."
+                    },
+                    {
+                        type: "mcq",
+                        question: "عندما تطلب تشغيل اللعبة، من يتحكم في اتجاه وسرعة 'العربة الجوالة'؟",
+                        options: ["الحاسب آلياً", "عشوائياً حسب التضاريس", "المستخدم باستخدام أسهم لوحة المفاتيح", "الكائنات الأخرى"],
+                        answer: 2,
+                        explanation: "التحكم اليدوي عبر أسهم لوحة المفاتيح هو أساس التفاعل في مثل هذه الألعاب."
+                    },
+                    {
+                        type: "tf",
+                        question: "تصميم النموذج الأولي (Prototype) يساعد في تصور الفكرة النهائية للعبة بشكل مبسط قبل إرهاق نفسك بالبرمجة.",
+                        options: ["صح", "خطأ"],
+                        answer: 0,
+                        explanation: "النموذج الأولي يحدد قابلية الفكرة للتنفيذ ويستبعد التعقيدات غير الضرورية قبل البدء."
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "محطة المستشعرات في علم الروبوت",
+                info: `
+                    <h3 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;">عنوان الدرس: المستشعرات في علم الروبوت</h3>
+                    <p style="color: #cbd5e1;"><strong>أهداف الدرس:</strong><br>
+                    • ماهية المستشعرات في الروبوت وأهميتها.<br>
+                    • التعرف على كيفية برمجة الروبوت (EV3) باستخدام المستشعرات كالموجات فوق الصوتية والألوان.<br>
+                    • كيفية إنشاء خريطة لمحاكاة بيئة حركة الروبوت واستخدام العوائق والمساحات الملونة.</p>
+                    
+                    <p style="color: #cbd5e1;"><strong>شرح المفاهيم الأساسية:</strong><br>
+                    • <em style="color: var(--accent);">المستشعر (Sensor):</em> الروبوتات ليس لديها حواس مثل البشر، لذا تحمل مستشعرات لتدرك بيئتها وتتفاعل مع المهام.<br>
+                    • <em style="color: var(--accent);">مستشعر الموجات فوق الصوتية:</em> يُرسل ترددات للصوت لترتد كصدى، مما يمكنه من اكتشاف المسافة والعوائق أمامه.<br>
+                    • <em style="color: var(--accent);">مستشعر الألوان:</em> يحدد طيف اللون والمساحات الأرضية، مثل تمييز اللون الأحمر أو الأزرق أو الخطوط السوداء للتتبع.<br>
+                    • <em style="color: var(--accent);">مستشعر اللمس:</em> يستجيب بشكل فيزيائي للضغط عليه من الأجسام المحيطة.<br>
+                    • <em style="color: var(--accent);">مستشعر الجيرسكوب:</em> يقيس زاوية وسرعة دوران الروبوت للحفاظ على اتزانه.</p>
+                    
+                    <p style="color: #cbd5e1;"><strong>خطوات التطبيق أو التنفيذ:</strong><br>
+                    1. <em style="color: var(--accent);">اختيار البيئة:</em> استخدم بيئة المحاكاة (Open Roberta Lab) لبرمجة الروبوت الافتراضي (EV3).<br>
+                    2. <em style="color: var(--accent);">إعداد المستشعر:</em> اختر من فئة اللبنات البرمجية (المستشعرات Sensors) اللبنة المناسبة لكي يرى أو يكتشف بها بيئته.<br>
+                    3. <em style="color: var(--accent);">كتابة الشرط:</em> اربط قراءة المُستشعِر بكتلة (تحكم Control) مثل "إذا كانت المسافة < 20 سم، فتوقف".<br>
+                    4. <em style="color: var(--accent);">الاختبار:</em> شغل الروبوت في خريطة المحاكي لمشاهدة استجابته الحية للمدخلات.</p>
+                    
+                    <p style="color: #cbd5e1;"><strong>أمثلة من الكتاب:</strong><br>
+                    برمجة الروبوت للسير للأمام وعندما يكتشف "مستشعر الموجات فوق الصوتية" وجود عائق على بُعد يقل عن 20 سم، يصدر أمراً للروبوت بالتوقف فوراً لتفادي الاصطدام والتصحيح (Debugging).</p>
+                `,
+                questions: [
+                    {
+                        type: "mcq",
+                        question: "المستشعر الذي يكتشف ويحس بالعوائق أمام الروبوت لمعرفة المسافة بينهما هو:",
+                        options: ["مستشعر الموجات فوق الصوتية", "مستشعر الألوان", "مستشعر اللمس", "مستشعر الجيرسكوب"],
+                        answer: 0,
+                        explanation: "يقوم مستشعر الموجات فوق الصوتية بإرسال موجات تنعكس عن العوائق ليحدد المسافة بدقة مقلداً حاسة السمع وتوجيه الخفافيش."
+                    },
+                    {
+                        type: "mcq",
+                        question: "الحواس في الإنسان يقابلها في مجال صناعة وبرمجة الروبوتات:",
+                        options: ["المستشعرات (Sensors)", "العجلات والمحركات", "الهيكل البلاستيكي", "أدوات التضاريس (Terrain)"],
+                        answer: 0,
+                        explanation: "تعتمد الروبوتات على مجموعة مستشعرات لمساراتها والتنقل بأمان، تماماً كحواس الإنسان لإدراك التفاعلات البيئية."
+                    },
+                    {
+                        type: "mcq",
+                        question: "منصة المحاكاة البرمجية المرئية التي ذُكرت في الدورة لمحاكاة حركة وبرمجة الروبوت EV3:",
+                        options: ["Scratch", "Open Roberta Lab", "Kodu Game", "Microsoft Excel"],
+                        answer: 1,
+                        explanation: "تُستخدم بيئة Open Roberta Lab لمحاكاة الروبوت التعليمي بشكل احترافي وفعال."
+                    },
+                    {
+                        type: "mcq",
+                        question: "ما هي وظيفة (مستشعر الألوان) الأساسية في الروبوت؟",
+                        options: ["تحذير الروبوت من الأجسام الصلبة والمسافات", "الاستجابة لضغطة اليد", "معرفة موقع وسرعة دورانه", "تمييز ألوان الخطوط والمساحات في المسار"],
+                        answer: 3,
+                        explanation: "يقرأ مستشعر الألوان درجات أطياف اللون (الضوئي)، وهو مثالي لعمل روبوت (تتبع الخط الأسود)."
+                    },
+                    {
+                        type: "mcq",
+                        question: "إذا أردت برمجة الروبوت ليعمل فقط عند الضغط بيدك على زر محدد في هيكله، فما المستشعر الأنسب؟",
+                        options: ["مستشعر اللمس", "مستشعر الصوت", "مستشعر ضوئي", "مستشعر المسافة"],
+                        answer: 0,
+                        explanation: "مستشعر اللمس (Touch Sensor) يعطي قيمة استجابة مادية مباشرة عند تصادمه المادي أو الضغط المباشر."
+                    },
+                    {
+                        type: "mcq",
+                        question: "لمراقبة سرعة دوران روبوت يحافظ على توازنه (كالذي يسير على عجلتين)، نستخدم:",
+                        options: ["مستشعر اللمس", "مستشعر الجيرسكوب (Gyroscope)", "مستشعر الألوان", "تصميم النماذج"],
+                        answer: 1,
+                        explanation: "الوظيفة الحصرية لمستشعر الجيرسكوب هي حساب التوازن وزوايا الدوران فيزيائياً."
+                    },
+                    {
+                        type: "tf",
+                        question: "روبوت المحاكاة قادر على اتخاذ القرارات من تلقاء نفسه بدون الحاجة لاستخدام كتل وشروط برمجية (إذا/وإلا).",
+                        options: ["صح", "خطأ"],
+                        answer: 1,
+                        explanation: "خطأ. الروبوت آلة عمياء؛ يعتمد كلياً على أوامر المبرمج وشروط (If - Then) ليتخذ قرارًا استناداً على قراءة المستشعرات."
+                    },
+                    {
+                        type: "tf",
+                        question: "مستشعر الموجات فوق الصوتية يرسل تردداتها الخاصة ويستقبل صداها لقياس المسافة بالاعتماد على سرعة الصوت.",
+                        options: ["صح", "خطأ"],
+                        answer: 0,
+                        explanation: "هذا صحيح ودقيق، فهو توظيف لآلية 'الصدى' وحساب زمن الارتداد لترجمته كمسافة رقمية."
+                    },
+                    {
+                        type: "mcq",
+                        question: "اسم المستشعر الذي يحتاجه الروبوت لتمييز تفاحة حمراء عن التفاحة الخضراء هو:",
+                        options: ["مستشعر اللمس", "مستشعر الموجات فوق الصوتية", "مستشعر الألوان (Color Sensor)", "مستشعر الجيرسكوب"],
+                        answer: 2,
+                        explanation: "هو الوحدة البرمجية والهندسية التي تحوي خلية قادرة على قراءة الارتداد اللوني للضوء."
+                    },
+                    {
+                        type: "tf",
+                        question: "يُقصد بمصطلح (Sensors) الحواس الصناعية التي تمكن الروبوت من استشعار بيئته لتحويلها لبيانات رقمية.",
+                        options: ["صح", "خطأ"],
+                        answer: 0,
+                        explanation: "المستشعر هو الأداة البينية لجمع البيانات وتحويلها من بيانات حسية لبيانات رقمية تستوعبها الآلة."
+                    },
+                    {
+                        type: "mcq",
+                        question: "من أهداف الدرس تعلم برمجة الروبوت (EV3)، كيف نعطيه أمراً برمجياً للتحرك للأمام وتتبع خط أسود؟",
+                        options: ["باستخدام مستشعر الموجات فوق الصوتية فقط", "باستخدام مستشعر الألوان لقراءة درجة اللون ولبنات الحركة", "باللمس المستمر للروبوت طوال المسار", "بوضع عقبات في كل الاتجاهات"],
+                        answer: 1,
+                        explanation: "تتبع الخط يتحقق عن طريق قراءة مستشعر الألوان باستمرار وتوجيه المحركات للبقاء على الخط."
+                    },
+                    {
+                        type: "tf",
+                        question: "لكي يقوم الروبوت برسم شكل هندسي متكرر (كمربع)، يجب برمجته باستخدام لبنات (التكرار Repeat).",
+                        options: ["صح", "خطأ"],
+                        answer: 0,
+                        explanation: "العبارة صحيحة، فبدلاً من كتابة الكود 4 مرات للمربع، يُستخدم التكرار لاختصار وتسهيل التعليمات المكررة."
+                    },
+                    {
+                        type: "mcq",
+                        question: "إذا أردت جعل الروبوت الخاص بك يصدر أصواتاً محددة عند اصطدامه بجدار، أي لبنة أوامر تستخدم؟",
+                        options: ["لبنة مستشعر الألوان", "لبنة تردد التشغيل بالهرتز (play frequency Hz)", "لبنة إيقاف المحركات", "لبنة التوجيه (Steer)"],
+                        answer: 1,
+                        explanation: "يحتوي قسم (Action - الحدث) على لبنات صوتية يمكن تشغيلها بترددات معينة لخلق مؤثرات عند حدوث تصادم أو تفاعل."
+                    },
+                    {
+                        type: "tf",
+                        question: "لا يمكن عرض نصوص أو رسائل على شاشة الروبوت في بيئة المحاكاة (Open Roberta) أثناء برمجته.",
+                        options: ["صح", "خطأ"],
+                        answer: 1,
+                        explanation: "خطأ، يمكنك برمجة الروبوت لعرض رسائل نصية توجيهية باستخدام لبنة (عرض النص show text) من فئة الحدث."
+                    },
+                    {
+                        type: "mcq",
+                        question: "لكي يتوقف الروبوت قبل أن يرتطم بعائق بمسافة معينة، نستخدم شرطًا برمجيًا يعتمد على قراءة:",
+                        options: ["عدد العجلات", "مستشعر المسافة (الموجات فوق الصوتية)", "لبنات مسح العرض", "لون السماء في البيئة المحيطة"],
+                        answer: 1,
+                        explanation: "الموجات فوق الصوتية توفر القراءات اللازمة (كالمسافة بالسنتيمتر) والتي يمكن استخدامها في الشروط البرمجية مثل: (إذا المسافة أقل من 20، توقف)."
+                    }
+                ]
+            }
+        ];
+
+        // الحالة
+        let currentStation = null;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let stationScores = {};
+        let stationProgressIndex = {}; // حفظ مؤشر التوقف لكل محطة
+        let completedStations = [];
+        let playerName = "";
+
+        // إنشاء النجوم في الخلفية
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // التنقل بين الشاشات
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        window.goBack = function (screenId) {
+            showScreen(screenId);
+        }
+
+        window.startGame = function () {
+            const nameInput = document.getElementById('player-name-input').value.trim();
+            if (!nameInput) {
+                alert("يرجى إدخال اسمك أولاً لبدء الرحلة!");
+                return;
+            }
+            playerName = nameInput;
+            document.getElementById('display-name').innerText = playerName;
+            document.getElementById('user-profile').style.display = 'block';
+
+            // تحقق من وجود تخزين مسبق
+            const savedData = localStorage.getItem('digitalGalaxySave_' + playerName);
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                score = data.score || 0;
+                completedStations = data.completedStations || [];
+                stationScores = data.stationScores || {};
+                stationProgressIndex = data.stationProgressIndex || {};
+
+                document.getElementById('current-score').innerText = score;
+                completedStations.forEach(id => {
+                    document.getElementById(`card-${id}`).classList.add('completed');
+                });
+                checkAllCompleted();
+            } else {
+                score = 0;
+                completedStations = [];
+                stationScores = {};
+                stationProgressIndex = {};
+                document.getElementById('current-score').innerText = score;
+                document.querySelectorAll('.station-card').forEach(card => card.classList.remove('completed'));
+                document.getElementById('finish-btn').style.display = 'none';
+            }
+
+            showScreen('stations-screen');
+        }
+
+        function saveProgress() {
+            if (!playerName) return;
+            const data = {
+                score: score,
+                completedStations: completedStations,
+                stationScores: stationScores,
+                stationProgressIndex: stationProgressIndex
+            };
+            localStorage.setItem('digitalGalaxySave_' + playerName, JSON.stringify(data));
+        }
+
+        function startStation(id) {
+            if (completedStations.includes(id)) return;
+
+            currentStation = stationsData[id];
+
+            // تحقق من وجود استئناف من نقطة سابقة
+            if (stationProgressIndex[id] !== undefined) {
+                currentQuestionIndex = stationProgressIndex[id];
+            } else {
+                currentQuestionIndex = 0;
+                stationScores[id] = 0;
+            }
+
+            document.getElementById('station-title').innerText = currentStation.title;
+            document.getElementById('station-info').innerHTML = currentStation.info;
+
+            document.getElementById('station-info-container').style.display = 'block';
+            document.getElementById('question-area').style.display = 'none';
+            document.getElementById('start-q-btn').style.display = 'inline-block';
+            document.getElementById('start-q-btn').innerText = (currentQuestionIndex > 0) ? "استئناف التحدي 🎯" : "ابدأ التحديات (" + currentStation.questions.length + " أسئلة) 🎯";
+
+            showScreen('station-screen');
+        }
+
+        function showQuestion() {
+            document.getElementById('station-info-container').style.display = 'none'; // Hide info when questions start
+            document.getElementById('start-q-btn').style.display = 'none';
+            document.getElementById('question-area').style.display = 'block';
+            document.getElementById('progress-container').style.display = 'block';
+            document.getElementById('feedback-msg').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'none';
+
+            let progressPct = ((currentQuestionIndex + 1) / currentStation.questions.length) * 100;
+            document.getElementById('progress-bar').style.width = progressPct + '%';
+            document.getElementById('progress-text').innerText = `${currentQuestionIndex + 1}/${currentStation.questions.length}`;
+
+            const q = currentStation.questions[currentQuestionIndex];
+
+            let qPrefix = (currentStation.questions.length > 1) ? `السؤال ${currentQuestionIndex + 1}/${currentStation.questions.length}: ` : "";
+            document.getElementById('question-text').innerText = qPrefix + q.question;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            if (q.type === 'mcq' || q.type === 'tf') {
+                q.options.forEach((opt, index) => {
+                    const optDiv = document.createElement('div');
+                    optDiv.className = 'option';
+                    optDiv.innerText = opt;
+                    optDiv.onclick = () => submitAnswer(index, optDiv, q);
+                    optionsContainer.appendChild(optDiv);
+                });
+            } else if (q.type === 'short') {
+                const inputDiv = document.createElement('div');
+                inputDiv.innerHTML = `
+                    <input type="text" id="short-answer-input" placeholder="اكتب إجابتك هنا..." style="width: 100%; padding: 15px; border-radius: 10px; border: 2px solid var(--primary); background: rgba(30, 41, 59, 0.8); color: white; font-size: 1.2rem; margin-bottom: 15px; font-family: 'Cairo', sans-serif;" autocomplete="off">
+                    <button onclick="submitShortAnswer()" style="width: 100%; margin: 0; padding: 15px; font-size: 1.1rem;">تحقق من الإجابة ✓</button>
+                `;
+                optionsContainer.appendChild(inputDiv);
+                setTimeout(() => document.getElementById('short-answer-input').focus(), 100);
+            }
+        }
+
+        window.submitShortAnswer = function () {
+            const inputEl = document.getElementById('short-answer-input');
+            const answerText = inputEl.value.trim();
+            const q = currentStation.questions[currentQuestionIndex];
+
+            if (!answerText) {
+                alert("يرجى كتابة إجابة أولاً!");
+                return;
+            }
+
+            inputEl.disabled = true;
+            document.querySelector('#short-answer-input + button').style.display = 'none'; // Hide submit button
+
+            let isCorrect = false;
+            for (let kw of q.keywords) {
+                if (answerText.includes(kw)) {
+                    isCorrect = true;
+                    break;
+                }
+            }
+
+            showFeedback(isCorrect, q);
+        }
+
+        window.submitAnswer = function (selectedIndex, element, q) {
+            const options = document.querySelectorAll('.option');
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+
+            let isCorrect = (selectedIndex === q.answer);
+
+            if (isCorrect) {
+                element.classList.add('correct');
+            } else {
+                element.classList.add('wrong');
+                options[q.answer].classList.add('correct');
+            }
+
+            showFeedback(isCorrect, q);
+        }
+
+        function showFeedback(isCorrect, q) {
+            const feedback = document.getElementById('feedback-msg');
+            feedback.style.display = 'block';
+
+            let explanationText = q.explanation ? `<br><span style="font-size: 1rem; color: #cbd5e1; font-weight: normal; display: block; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">${q.explanation}</span>` : "";
+
+            if (q.type === 'short') {
+                let statusText = isCorrect ? 'إجابة رائعة! 🌟' : 'إجابة غير مكتملة. قارن إجابتك بالنموذج التالي.';
+                let color = isCorrect ? 'var(--success)' : 'var(--error)';
+
+                feedback.innerHTML = `
+                    <span style="color: ${color};">${statusText}</span><br>
+                    <span style="font-size: 1.1rem; color: #fff; display: block; margin-top: 10px; background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 8px;"><strong>الإجابة النموذجية:</strong> ${q.modelAnswer}</span>
+                    ${explanationText}
+                `;
+                feedback.style.borderLeft = `5px solid ${color}`;
+                if (isCorrect) {
+                    score++;
+                    stationScores[currentStation.id]++;
+                    document.getElementById('current-score').innerText = score;
+                }
+            } else {
+                if (isCorrect) {
+                    feedback.innerHTML = 'إجابة صحيحة! أحسنت 🌟' + explanationText;
+                    feedback.style.color = 'var(--success)';
+                    feedback.style.borderLeft = '5px solid var(--success)';
+                    score++;
+                    stationScores[currentStation.id]++;
+                    document.getElementById('current-score').innerText = score;
+                } else {
+                    feedback.innerHTML = 'إجابة خاطئة! حاول التركيز أكثر.' + explanationText;
+                    feedback.style.color = 'var(--error)';
+                    feedback.style.borderLeft = '5px solid var(--error)';
+                }
+            }
+
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.style.display = 'inline-block';
+
+            if (currentQuestionIndex === currentStation.questions.length - 1) {
+                nextBtn.innerText = "العودة للمحطات والمتابعة ↩";
+                nextBtn.onclick = returnToStations;
+
+                if (!completedStations.includes(currentStation.id)) {
+                    completedStations.push(currentStation.id);
+                    document.getElementById(`card-${currentStation.id}`).classList.add('completed');
+                }
+                saveProgress();
+                checkAllCompleted();
+            } else {
+                nextBtn.innerText = "التالي ➡";
+                nextBtn.onclick = nextQuestion;
+                stationProgressIndex[currentStation.id] = currentQuestionIndex; // تحديث المؤشر للحفظ
+                saveProgress();
+            }
+        }
+
+        window.nextQuestion = function () {
+            currentQuestionIndex++;
+            stationProgressIndex[currentStation.id] = currentQuestionIndex; // تحديث المؤشر بزيادة السؤال
+            showQuestion();
+        }
+
+        function checkAllCompleted() {
+            if (completedStations.length === 4) {
+                document.getElementById('finish-btn').style.display = 'inline-block';
+            }
+        }
+
+        window.returnToStations = function () {
+            if (completedStations.length === 4) {
+                showFinalResult();
+            } else {
+                showScreen('stations-screen');
+            }
+        }
+
+        function showFinalResult() {
+            document.getElementById('final-name').innerText = playerName;
+            document.getElementById('final-score').innerText = score;
+            const message = document.getElementById('final-message');
+
+            const maxScore = parseInt(document.getElementById('final-total-score').innerText);
+
+            let breakdownHTML = '<h3 style="color: var(--primary); margin-bottom: 15px; text-align: center;">تفاصيل نقاط المحطات:</h3><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">';
+            stationsData.forEach(st => {
+                breakdownHTML += `<div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; text-align: center;"><strong>${st.title}</strong><br><span style="color: var(--accent); font-size: 1.2rem;">${stationScores[st.id] || 0}</span> / ${st.questions.length}</div>`;
+            });
+            breakdownHTML += '</div>';
+
+            const breakdownContainer = document.getElementById('station-scores-breakdown');
+            breakdownContainer.innerHTML = breakdownHTML;
+            breakdownContainer.style.display = 'block';
+
+            if (score === maxScore) {
+                message.innerText = "أنت عبقري المهارات الرقمية! علامتك كاملة ونادرة 🏆.";
+            } else if (score >= maxScore * 0.7) {
+                message.innerText = "عمل رائع ومجهود جبار! مهاراتك الرقمية متقدمة.";
+            } else {
+                message.innerText = "بداية جيدة ومحاولة شجاعة، العودة للمذاكرة ستجعلك أسطورة 🛸.";
+            }
+
+            let percentage = Math.round((score / maxScore) * 100);
+            saveToLeaderboard(playerName, score, percentage);
+            displayLeaderboard();
+
+            if (completedStations.length === stationsData.length) {
+                document.getElementById('cert-btn-display').style.display = 'block';
+            }
+
+            showScreen('result-screen');
+        }
+
+        function saveToLeaderboard(name, finalScore, completionPercentage) {
+            let leaderboard = JSON.parse(localStorage.getItem('galaxyLeaderboard')) || [];
+            const existingIndex = leaderboard.findIndex(entry => entry.name === name);
+            const dateStr = new Date().toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' });
+
+            if (existingIndex > -1) {
+                if (finalScore >= leaderboard[existingIndex].score) {
+                    leaderboard[existingIndex].score = finalScore;
+                    leaderboard[existingIndex].percentage = completionPercentage;
+                    leaderboard[existingIndex].date = dateStr;
+                }
+            } else {
+                leaderboard.push({ name: name, score: finalScore, percentage: completionPercentage, date: dateStr });
+            }
+
+            leaderboard.sort((a, b) => b.score - a.score);
+            leaderboard = leaderboard.slice(0, 10);
+            localStorage.setItem('galaxyLeaderboard', JSON.stringify(leaderboard));
+        }
+
+        function displayLeaderboard() {
+            const leaderboard = JSON.parse(localStorage.getItem('galaxyLeaderboard')) || [];
+            const tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = '';
+
+            if (leaderboard.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">لا توجد سجلات.</td></tr>';
+                return;
+            }
+
+            leaderboard.forEach((entry, index) => {
+                let badge = '';
+                if (index === 0) badge = '🥇';
+                else if (index === 1) badge = '🥈';
+                else if (index === 2) badge = '🥉';
+
+                tbody.innerHTML += `
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s;">
+                        <td style="padding: 8px;">${index + 1} ${badge}</td>
+                        <td>${entry.name}</td>
+                        <td style="color: var(--accent); font-weight: bold;">${entry.score}</td>
+                        <td style="color: var(--success);">${entry.percentage || 0}%</td>
+                        <td style="font-size: 0.8rem; color: #cbd5e1;">${entry.date}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        window.showCertificate = function () {
+            const maxScore = parseInt(document.getElementById('final-total-score').innerText);
+            let percentage = Math.round((score / maxScore) * 100);
+
+            document.getElementById('cert-name').innerText = playerName;
+            document.getElementById('cert-percentage').innerText = percentage + "%";
+            document.getElementById('cert-score').innerText = score;
+            document.getElementById('cert-max').innerText = maxScore;
+            document.getElementById('cert-date').innerText = new Date().toLocaleDateString('ar-SA');
+
+            showScreen('certificate-screen');
+        }
+
+        window.resetGame = function () {
+            if (!confirm('هل أنت متأكد من رغبتك في مسح تقدمك بالكامل والبدء من جديد؟')) {
+                return;
+            }
+            score = 0;
+            stationScores = {};
+            stationProgressIndex = {};
+            completedStations = [];
+            saveProgress();
+
+            document.getElementById('current-score').innerText = score;
+            document.getElementById('station-scores-breakdown').style.display = 'none';
+
+            document.querySelectorAll('.station-card').forEach(card => {
+                card.classList.remove('completed');
+            });
+
+            document.getElementById('finish-btn').style.display = 'none';
+            document.getElementById('cert-btn-display').style.display = 'none';
+            showScreen('home-screen');
+        }
+
+        // التهيئة
+        window.onload = () => {
+            createStars();
+            // حساب الدرجة القصوى ديناميكياً
+            const maxScore = stationsData.reduce((acc, st) => acc + st.questions.length, 0);
+            document.getElementById('max-score').innerText = maxScore;
+            document.getElementById('final-total-score').innerText = maxScore;
+        };
+    </script>
+</body>
+
+</html>
